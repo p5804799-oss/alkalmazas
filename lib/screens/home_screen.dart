@@ -15,6 +15,14 @@ class MainNavigationScreen extends StatefulWidget {
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _currentIndex = 0;
 
+  final List<Widget> _screens = const [
+    DashboardTab(),
+    FriendsTab(),
+    RecipesTab(),
+    FoodsTab(),
+    TrendTab(),
+  ];
+
   void _onTabChanged(int index) {
     setState(() {
       _currentIndex = index;
@@ -23,17 +31,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> tabs = [
-      const DashboardTab(),
-      const FriendsTab(),
-      const RecipesTab(),
-      const FoodsTab(),
-      const TrendTab(),
-    ];
-
     return Scaffold(
       backgroundColor: const Color(0xFF07101B),
-      body: tabs[_currentIndex],
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _screens,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: _onTabChanged,
