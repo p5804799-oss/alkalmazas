@@ -1,4 +1,4 @@
-name: Build iOS App
+name: Build Apps
 
 on:
   push:
@@ -6,17 +6,17 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: macos-14
-
+  build-android:
+    name: Build Android APK
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Java
+      - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
+          distribution: 'temurin'
           java-version: '17'
 
       - name: Set up Flutter
@@ -25,10 +25,35 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Get dependencies
+      - name: Install dependencies
         run: flutter pub get
 
-      - name: Build iOS Application (No Code Signing)
+      - name: Build Android APK
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: FutyFurutty-Android-APK
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+  build-ios:
+    name: Build iOS IPA
+    runs-on: macos-14
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build iOS Application
         run: |
           flutter build ios --release --no-codesign
           cd build/ios/iphoneos
@@ -36,7 +61,7 @@ jobs:
           cp -r Runner.app Payload/
           zip -r FutyFurutty_iOS.ipa Payload
 
-      - name: Upload IPA Artifact
+      - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
           name: FutyFurutty-iOS-Package
