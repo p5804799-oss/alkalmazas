@@ -81,8 +81,19 @@ class _DashboardTabState extends State<DashboardTab> {
   final double _targetCarbs = 250.0;
   final double _targetFat = 70.0;
 
+  String _workoutDayType = 'Pihenőnap 😴';
   List<MealItem> _meals = [];
   List<WorkoutSet> _workouts = [];
+
+  final List<String> _workoutTypeOptions = [
+    'Pihenőnap 😴',
+    'Mell - Tricepsz 💪',
+    'Hát - Bicepsz 🏋️',
+    'Láb - Váll 🦵',
+    'Kardió - Has 🏃',
+    'Teljes Test (Full Body) 🔥',
+    'Egyedi Edzés ⚡',
+  ];
 
   Timer? _restTimer;
   int _restSecondsRemaining = 0;
@@ -104,8 +115,12 @@ class _DashboardTabState extends State<DashboardTab> {
     final prefs = await SharedPreferences.getInstance();
     final String? mealData = prefs.getString('daily_meals_data');
     final String? workoutData = prefs.getString('daily_workouts_data');
+    final String? savedWorkoutType = prefs.getString('daily_workout_type');
 
     setState(() {
+      if (savedWorkoutType != null) {
+        _workoutDayType = savedWorkoutType;
+      }
       if (mealData != null && mealData.isNotEmpty) {
         final List<dynamic> decoded = jsonDecode(mealData);
         _meals = decoded.map((m) => MealItem.fromMap(m)).toList();
@@ -119,18 +134,16 @@ class _DashboardTabState extends State<DashboardTab> {
 
   Future<void> _saveDashboardData() async {
     final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('daily_workout_type', _workoutDayType);
     await prefs.setString(
         'daily_meals_data', jsonEncode(_meals.map((m) => m.toMap()).toList()));
     await prefs.setString('daily_workouts_data',
         jsonEncode(_workouts.map((w) => w.toMap()).toList()));
   }
 
-  int get _consumedCalories =>
-      _meals.fold(0, (sum, item) => sum + item.calories);
-  double get _consumedProtein =>
-      _meals.fold(0.0, (sum, item) => sum + item.protein);
-  double get _consumedCarbs =>
-      _meals.fold(0.0, (sum, item) => sum + item.carbs);
+  int get _consumedCalories => _meals.fold(0, (sum, item) => sum + item.calories);
+  double get _consumedProtein => _meals.fold(0.0, (sum, item) => sum + item.protein);
+  double get _consumedCarbs => _meals.fold(0.0, (sum, item) => sum + item.carbs);
   double get _consumedFat => _meals.fold(0.0, (sum, item) => sum + item.fat);
 
   void _startRestTimer(int seconds) {
@@ -153,13 +166,80 @@ class _DashboardTabState extends State<DashboardTab> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Pihenőidő letelt! Következő széria! 💪'),
+              content: Text('Pihenőidő letelt! Mehet a következő széria! 💪'),
               backgroundColor: Color(0xFF28D5CF),
             ),
           );
         }
       }
     });
+  }
+
+  void _showChangeWorkoutTypeDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: const Color(0xFF07101B),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: Color(0xFF26364A)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Mai Edzésterv Típusa',
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+              ),
+              const SizedBox(height: 14),
+              ..._workoutTypeOptions.map((type) {
+                final isSelected = type == _workoutDayType;
+                return InkWell(
+                  onTap: () {
+                    setState(() {
+                      _workoutDayType = type;
+                    });
+                    _saveDashboardData();
+                    Navigator.of(ctx, rootNavigator: true).pop();
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: isSelected ? const Color(0xFF166864) : const Color(0xFF0D1825),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isSelected ? const Color(0xFF28D5CF) : const Color(0xFF26364A),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          type,
+                          style: TextStyle(
+                            color: isSelected ? const Color(0xFF28D5CF) : Colors.white,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          ),
+                        ),
+                        if (isSelected)
+                          const Icon(Icons.check_circle, color: Color(0xFF28D5CF), size: 18),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   void _showAddMealDialog() {
@@ -184,29 +264,24 @@ class _DashboardTabState extends State<DashboardTab> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Étel Rögzítése',
+                'Étel Hozzáadása',
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.white),
               ),
               const SizedBox(height: 14),
-              _buildInputField(nameCtrl, 'Étel neve (pl. Csirkemell rizzsel)'),
+              _buildInputField(nameCtrl, 'Étel neve (pl. Zabkása fehérjével)'),
               const SizedBox(height: 10),
               _buildInputField(calCtrl, 'Kalória (kcal)', isNumber: true),
               const SizedBox(height: 10),
               Row(
                 children: [
-                  Expanded(
-                      child:
-                          _buildInputField(pCtrl, 'Fehérje (g)', isNumber: true)),
+                  Expanded(child: _buildInputField(pCtrl, 'Fehérje (g)', isNumber: true)),
                   const SizedBox(width: 8),
-                  Expanded(
-                      child:
-                          _buildInputField(cCtrl, 'Szénhidrát (g)', isNumber: true)),
+                  Expanded(child: _buildInputField(cCtrl, 'Szénhidrát (g)', isNumber: true)),
                   const SizedBox(width: 8),
-                  Expanded(
-                      child: _buildInputField(fCtrl, 'Zsír (g)', isNumber: true)),
+                  Expanded(child: _buildInputField(fCtrl, 'Zsír (g)', isNumber: true)),
                 ],
               ),
               const SizedBox(height: 20),
@@ -242,10 +317,10 @@ class _DashboardTabState extends State<DashboardTab> {
                       );
                     });
                     _saveDashboardData();
-                    Navigator.pop(ctx);
+                    Navigator.of(ctx, rootNavigator: true).pop();
                   },
                   child: const Text(
-                    'HOZZÁADÁS',
+                    'MENTÉS',
                     style: TextStyle(
                         color: Color(0xFF07101B),
                         fontWeight: FontWeight.bold),
@@ -279,24 +354,20 @@ class _DashboardTabState extends State<DashboardTab> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Edzésszéria Rögzítése',
+                'Új Széria Rögzítése',
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.white),
               ),
               const SizedBox(height: 14),
-              _buildInputField(nameCtrl, 'Gyakorlat (pl. Fekvenyomás)'),
+              _buildInputField(nameCtrl, 'Gyakorlat neve (pl. Guggolás)'),
               const SizedBox(height: 10),
               Row(
                 children: [
-                  Expanded(
-                      child: _buildInputField(weightCtrl, 'Súly (kg)',
-                          isNumber: true)),
+                  Expanded(child: _buildInputField(weightCtrl, 'Súly (kg)', isNumber: true)),
                   const SizedBox(width: 10),
-                  Expanded(
-                      child: _buildInputField(repsCtrl, 'Ismétlés',
-                          isNumber: true)),
+                  Expanded(child: _buildInputField(repsCtrl, 'Ismétlés', isNumber: true)),
                 ],
               ),
               const SizedBox(height: 20),
@@ -312,8 +383,7 @@ class _DashboardTabState extends State<DashboardTab> {
                   onPressed: () {
                     final name = nameCtrl.text.trim();
                     final weight =
-                        double.tryParse(weightCtrl.text.replaceAll(',', '.')) ??
-                            0.0;
+                        double.tryParse(weightCtrl.text.replaceAll(',', '.')) ?? 0.0;
                     final reps = int.tryParse(repsCtrl.text) ?? 0;
 
                     if (name.isEmpty || reps <= 0) return;
@@ -330,11 +400,11 @@ class _DashboardTabState extends State<DashboardTab> {
                       );
                     });
                     _saveDashboardData();
-                    Navigator.pop(ctx);
+                    Navigator.of(ctx, rootNavigator: true).pop();
                     _startRestTimer(90);
                   },
                   child: const Text(
-                    'SZÉRIA MENTÉSE & PIHENŐ INDÍTÁSA (90s)',
+                    'SZÉRIA RÖGZÍTÉSE & PIHENŐ (90s)',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         color: Colors.white, fontWeight: FontWeight.bold),
@@ -348,8 +418,7 @@ class _DashboardTabState extends State<DashboardTab> {
     );
   }
 
-  Widget _buildInputField(TextEditingController ctrl, String hint,
-      {bool isNumber = false}) {
+  Widget _buildInputField(TextEditingController ctrl, String hint, {bool isNumber = false}) {
     return TextField(
       controller: ctrl,
       keyboardType:
@@ -361,8 +430,7 @@ class _DashboardTabState extends State<DashboardTab> {
         filled: true,
         fillColor: const Color(0xFF0D1825),
         isDense: true,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: const BorderSide(color: Color(0xFF26364A)),
@@ -378,8 +446,7 @@ class _DashboardTabState extends State<DashboardTab> {
   @override
   Widget build(BuildContext context) {
     final remainingCalories = _targetCalories - _consumedCalories;
-    final calorieProgress =
-        (_consumedCalories / _targetCalories).clamp(0.0, 1.0);
+    final calorieProgress = (_consumedCalories / _targetCalories).clamp(0.0, 1.0);
 
     return Scaffold(
       backgroundColor: const Color(0xFF07101B),
@@ -399,8 +466,7 @@ class _DashboardTabState extends State<DashboardTab> {
                 border: Border.all(color: const Color(0xFF26364A)),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(Icons.settings_outlined,
-                  size: 20, color: Color(0xFF28D5CF)),
+              child: const Icon(Icons.settings_outlined, size: 20, color: Color(0xFF28D5CF)),
             ),
             onPressed: () {
               showDialog(
@@ -417,12 +483,11 @@ class _DashboardTabState extends State<DashboardTab> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Pihenőidő lebegő csík (ha aktív)
+            // Pihenőidő lebegő csík
             if (_isRestTimerActive)
               Container(
                 margin: const EdgeInsets.only(bottom: 16),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFF356D).withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(14),
@@ -433,27 +498,75 @@ class _DashboardTabState extends State<DashboardTab> {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.timer_outlined,
-                            color: Color(0xFFFF356D)),
+                        const Icon(Icons.timer_outlined, color: Color(0xFFFF356D)),
                         const SizedBox(width: 10),
                         Text(
                           'Pihenőidő hátra: $_restSecondsRemaining mp',
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold),
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
                     TextButton(
                       onPressed: () => _startRestTimer(0),
                       child: const Text('Kész',
-                          style: TextStyle(
-                              color: Color(0xFFFF356D),
-                              fontWeight: FontWeight.bold)),
+                          style: TextStyle(color: Color(0xFFFF356D), fontWeight: FontWeight.bold)),
                     )
                   ],
                 ),
               ),
+
+            // Napi Edzésállapot és terv módosító kártya
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0D1825),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFF26364A)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1B2A3D),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(Icons.event_note, color: Color(0xFF28D5CF), size: 20),
+                      ),
+                      const SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Mai edzésprogram:',
+                              style: TextStyle(color: Color(0xFF91A2B5), fontSize: 11)),
+                          Text(
+                            _workoutDayType,
+                            style: const TextStyle(
+                                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Color(0xFF28D5CF)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    ),
+                    onPressed: _showChangeWorkoutTypeDialog,
+                    child: const Text('Módosítás',
+                        style: TextStyle(
+                            color: Color(0xFF28D5CF), fontWeight: FontWeight.bold, fontSize: 12)),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 16),
 
             // Kalória és Makró Összegző Kártya
             Container(
@@ -489,8 +602,7 @@ class _DashboardTabState extends State<DashboardTab> {
                           ),
                           Text(
                             'Elfogyasztva: $_consumedCalories / $_targetCalories kcal',
-                            style: const TextStyle(
-                                color: Color(0xFF55687D), fontSize: 12),
+                            style: const TextStyle(color: Color(0xFF55687D), fontSize: 12),
                           ),
                         ],
                       ),
@@ -510,9 +622,7 @@ class _DashboardTabState extends State<DashboardTab> {
                           Text(
                             '${(calorieProgress * 100).toInt()}%',
                             style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13),
+                                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
                           ),
                         ],
                       ),
@@ -521,15 +631,11 @@ class _DashboardTabState extends State<DashboardTab> {
                   const SizedBox(height: 20),
                   const Divider(color: Color(0xFF1B2A3D)),
                   const SizedBox(height: 12),
-                  // Makró progress csíkok
-                  _buildMacroRow('Fehérje', _consumedProtein, _targetProtein,
-                      const Color(0xFF28D5CF)),
+                  _buildMacroRow('Fehérje', _consumedProtein, _targetProtein, const Color(0xFF28D5CF)),
                   const SizedBox(height: 10),
-                  _buildMacroRow('Szénhidrát', _consumedCarbs, _targetCarbs,
-                      const Color(0xFFFFB800)),
+                  _buildMacroRow('Szénhidrát', _consumedCarbs, _targetCarbs, const Color(0xFFFFB800)),
                   const SizedBox(height: 10),
-                  _buildMacroRow('Zsír', _consumedFat, _targetFat,
-                      const Color(0xFFFF356D)),
+                  _buildMacroRow('Zsír', _consumedFat, _targetFat, const Color(0xFFFF356D)),
                 ],
               ),
             ),
@@ -541,13 +647,9 @@ class _DashboardTabState extends State<DashboardTab> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text('Mai Étkezések',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold)),
+                    style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold)),
                 IconButton(
-                  icon: const Icon(Icons.add_circle,
-                      color: Color(0xFF28D5CF), size: 28),
+                  icon: const Icon(Icons.add_circle, color: Color(0xFF28D5CF), size: 28),
                   onPressed: _showAddMealDialog,
                 ),
               ],
@@ -563,8 +665,7 @@ class _DashboardTabState extends State<DashboardTab> {
                   final item = _meals[i];
                   return Container(
                     margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                     decoration: BoxDecoration(
                       color: const Color(0xFF0D1825),
                       borderRadius: BorderRadius.circular(12),
@@ -578,20 +679,16 @@ class _DashboardTabState extends State<DashboardTab> {
                           children: [
                             Text(item.name,
                                 style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14)),
+                                    color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
                             const SizedBox(height: 2),
                             Text(
                               '${item.calories} kcal | F: ${item.protein}g Sz: ${item.carbs}g Zs: ${item.fat}g',
-                              style: const TextStyle(
-                                  color: Color(0xFF91A2B5), fontSize: 11),
+                              style: const TextStyle(color: Color(0xFF91A2B5), fontSize: 11),
                             ),
                           ],
                         ),
                         IconButton(
-                          icon: const Icon(Icons.delete_outline,
-                              color: Color(0xFFFF356D), size: 18),
+                          icon: const Icon(Icons.delete_outline, color: Color(0xFFFF356D), size: 18),
                           onPressed: () {
                             setState(() => _meals.removeAt(i));
                             _saveDashboardData();
@@ -605,24 +702,20 @@ class _DashboardTabState extends State<DashboardTab> {
 
             const SizedBox(height: 24),
 
-            // Edzés Szekció
+            // Edzésszériák Szekció
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Mai Edzés & Szériák',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold)),
+                const Text('Rögzített Szériák',
+                    style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold)),
                 IconButton(
-                  icon: const Icon(Icons.add_circle,
-                      color: Color(0xFFFF356D), size: 28),
+                  icon: const Icon(Icons.add_circle, color: Color(0xFFFF356D), size: 28),
                   onPressed: _showAddWorkoutDialog,
                 ),
               ],
             ),
             if (_workouts.isEmpty)
-              _buildEmptyPlaceholder('Még nincs rögzített edzésszéria ma.')
+              _buildEmptyPlaceholder('Még nincs rögzített széria a mai edzéshez.')
             else
               ListView.builder(
                 shrinkWrap: true,
@@ -632,8 +725,7 @@ class _DashboardTabState extends State<DashboardTab> {
                   final setItem = _workouts[i];
                   return Container(
                     margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                     decoration: BoxDecoration(
                       color: const Color(0xFF0D1825),
                       borderRadius: BorderRadius.circular(12),
@@ -659,21 +751,17 @@ class _DashboardTabState extends State<DashboardTab> {
                               children: [
                                 Text(setItem.exerciseName,
                                     style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14)),
+                                        color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
                                 Text(
                                   '${setItem.weightKg} kg × ${setItem.reps} ismétlés',
-                                  style: const TextStyle(
-                                      color: Color(0xFF91A2B5), fontSize: 12),
+                                  style: const TextStyle(color: Color(0xFF91A2B5), fontSize: 12),
                                 ),
                               ],
                             ),
                           ],
                         ),
                         IconButton(
-                          icon: const Icon(Icons.delete_outline,
-                              color: Color(0xFFFF356D), size: 18),
+                          icon: const Icon(Icons.delete_outline, color: Color(0xFFFF356D), size: 18),
                           onPressed: () {
                             setState(() => _workouts.removeAt(i));
                             _saveDashboardData();
@@ -690,22 +778,17 @@ class _DashboardTabState extends State<DashboardTab> {
     );
   }
 
-  Widget _buildMacroRow(
-      String label, double current, double max, Color activeColor) {
+  Widget _buildMacroRow(String label, double current, double max, Color activeColor) {
     final progress = (current / max).clamp(0.0, 1.0);
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label,
-                style:
-                    const TextStyle(color: Color(0xFF91A2B5), fontSize: 12)),
+            Text(label, style: const TextStyle(color: Color(0xFF91A2B5), fontSize: 12)),
             Text('${current.toStringAsFixed(1)} / ${max.toInt()}g',
                 style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold)),
+                    color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
           ],
         ),
         const SizedBox(height: 6),
@@ -732,8 +815,7 @@ class _DashboardTabState extends State<DashboardTab> {
         border: Border.all(color: const Color(0xFF1B2A3D)),
       ),
       child: Center(
-        child: Text(text,
-            style: const TextStyle(color: Color(0xFF55687D), fontSize: 13)),
+        child: Text(text, style: const TextStyle(color: Color(0xFF55687D), fontSize: 13)),
       ),
     );
   }

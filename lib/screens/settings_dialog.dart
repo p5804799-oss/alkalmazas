@@ -60,11 +60,11 @@ class _SettingsDialogState extends State<SettingsDialog> {
     }
 
     if (mounted) {
-      Navigator.pop(context);
+      Navigator.of(context, rootNavigator: true).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Egyedi értesítés beállítva!', style: TextStyle(color: Color(0xFF28D5CF))),
-          backgroundColor: Color(0xFF0D1825),
+          content: Text('Beállítások elmentve és aktiválva!'),
+          backgroundColor: Color(0xFF28D5CF),
         ),
       );
     }
@@ -90,18 +90,18 @@ class _SettingsDialogState extends State<SettingsDialog> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'Egyedi Értesítés',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFFF5F8FB)),
+                    'Beállítások & Értesítés',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Colors.white),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close, color: Color(0xFF91A2B5), size: 20),
-                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close, color: Color(0xFF91A2B5), size: 22),
+                    onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
                   color: const Color(0xFF0D1825),
                   border: Border.all(color: const Color(0xFF26364A)),
@@ -111,15 +111,14 @@ class _SettingsDialogState extends State<SettingsDialog> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'Értesítések engedélyezése',
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFF5F8FB)),
+                      'Értesítések bekapcsolása',
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                     Switch(
                       value: _enabled,
-                      activeColor: const Color(0xFF28D5CF),
-                      activeTrackColor: const Color(0xFF166864),
-                      inactiveThumbColor: const Color(0xFF91A2B5),
-                      inactiveTrackColor: const Color(0xFF111F2E),
+                      activeTrackColor: const Color(0xFF28D5CF),
+                      activeThumbColor: const Color(0xFF07101B),
+                      inactiveTrackColor: const Color(0xFF1B2A3D),
                       onChanged: (v) => setState(() => _enabled = v),
                     ),
                   ],
@@ -127,7 +126,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
               ),
               if (_enabled) ...[
                 const SizedBox(height: 16),
-                const Text('Milyen gyakran ismétlődjön?', style: TextStyle(fontSize: 13, color: Color(0xFF91A2B5))),
+                const Text('Emlékeztető gyakorisága', style: TextStyle(fontSize: 12, color: Color(0xFF91A2B5))),
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -155,44 +154,40 @@ class _SettingsDialogState extends State<SettingsDialog> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text('Értesítés Címe', style: TextStyle(fontSize: 13, color: Color(0xFF91A2B5))),
+                const Text('Értesítés címe', style: TextStyle(fontSize: 12, color: Color(0xFF91A2B5))),
                 const SizedBox(height: 8),
                 TextField(
                   controller: _titleController,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.white, fontSize: 14),
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: const Color(0xFF0D1825),
-                    hintText: 'Pl. Igyál fehérjét!',
-                    hintStyle: const TextStyle(color: Color(0xFF55687D)),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: Color(0xFF26364A)),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: Color(0xFF28D5CF)),
                     ),
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text('Értesítés Szövege', style: TextStyle(fontSize: 13, color: Color(0xFF91A2B5))),
+                const Text('Értesítés üzenete', style: TextStyle(fontSize: 12, color: Color(0xFF91A2B5))),
                 const SizedBox(height: 8),
                 TextField(
                   controller: _bodyController,
                   maxLines: 2,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.white, fontSize: 14),
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: const Color(0xFF0D1825),
-                    hintText: 'Pl. Napi 2g/tskg fehérje a cél!',
-                    hintStyle: const TextStyle(color: Color(0xFF55687D)),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: Color(0xFF26364A)),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: Color(0xFF28D5CF)),
                     ),
                   ),
@@ -209,7 +204,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
                   ),
                   onPressed: _saveSettings,
                   child: const Text(
-                    'MENTÉS ÉS AKTIVÁLÁS',
+                    'MENTÉS ÉS BEÁLLÍTÁS',
                     style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white),
                   ),
                 ),
