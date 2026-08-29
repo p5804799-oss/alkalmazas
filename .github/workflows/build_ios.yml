@@ -1,4 +1,4 @@
-name: Build Apps
+name: Build Android and iOS Apps
 
 on:
   push:
@@ -28,10 +28,10 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build Android APK
+      - name: Build Android Release APK
         run: flutter build apk --release
 
-      - name: Upload APK
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: FutyFurutty-Android-APK
@@ -61,7 +61,7 @@ jobs:
           cp -r Runner.app Payload/
           zip -r FutyFurutty_iOS.ipa Payload
 
-      - name: Upload IPA
+      - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
           name: FutyFurutty-iOS-Package
