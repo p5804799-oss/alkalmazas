@@ -191,8 +191,8 @@ class _DashboardTabState extends State<DashboardTab> {
               text: const TextSpan(
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: -0.8),
                 children: [
-                  TextSpan(text: 'Füty', style: TextStyle(color: Color(0xFF28D5CF))),
-                  TextSpan(text: 'fürütty', style: TextStyle(color: Color(0xFFFF356D))),
+                  TextSpan(text: 'Dagi', style: TextStyle(color: Color(0xFF28D5CF))),
+                  TextSpan(text: 'App', style: TextStyle(color: Color(0xFFFF356D))),
                 ],
               ),
             ),
