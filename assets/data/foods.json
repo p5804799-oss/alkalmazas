@@ -1,0 +1,1042 @@
+[
+  {
+    "category": "Tejtermék",
+    "name": "Pilos Light Trappista sajt",
+    "kcal": 282.0,
+    "protein": 31.0,
+    "carbs": 1.7,
+    "fat": 16.0,
+    "unit": "100 g",
+    "note": "Címkével később ellenőrizhető"
+  },
+  {
+    "category": "Tejtermék",
+    "name": "Pilos Cottage Cheese (natúr)",
+    "kcal": 92.0,
+    "protein": 12.0,
+    "carbs": 2.5,
+    "fat": 3.7,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Tejtermék",
+    "name": "Pilos Skyr (natúr, 0%)",
+    "kcal": 61.0,
+    "protein": 10.6,
+    "carbs": 3.5,
+    "fat": 0.2,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Tejtermék",
+    "name": "Pilos Görög joghurt (10%)",
+    "kcal": 121.0,
+    "protein": 3.2,
+    "carbs": 4.2,
+    "fat": 10.0,
+    "unit": "100 g",
+    "note": "Proteinforrásnak gyenge; krémesítőként jó"
+  },
+  {
+    "category": "Tejtermék",
+    "name": "Pilos Zsírszegény túró (0,5%)",
+    "kcal": 68.0,
+    "protein": 12.0,
+    "carbs": 3.8,
+    "fat": 0.5,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Tejtermék",
+    "name": "Pilos Mozzarella Light",
+    "kcal": 165.0,
+    "protein": 19.0,
+    "carbs": 1.5,
+    "fat": 9.0,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Tejtermék",
+    "name": "Goldessa / Pilos Light krémsajt",
+    "kcal": 152.0,
+    "protein": 9.0,
+    "carbs": 4.0,
+    "fat": 11.0,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Tejtermék",
+    "name": "Pilos ESL tej 1,5%",
+    "kcal": 44.0,
+    "protein": 3.2,
+    "carbs": 4.7,
+    "fat": 1.5,
+    "unit": "100 ml",
+    "note": ""
+  },
+  {
+    "category": "Tejtermék",
+    "name": "Pilos ESL tej 2,8%",
+    "kcal": 56.0,
+    "protein": 3.2,
+    "carbs": 4.7,
+    "fat": 2.8,
+    "unit": "100 ml",
+    "note": ""
+  },
+  {
+    "category": "Felvágott",
+    "name": "Dulano csirkemell/pulykaszendvics sonka",
+    "kcal": 94.0,
+    "protein": 21.0,
+    "carbs": 1.0,
+    "fat": 1.0,
+    "unit": "100 g",
+    "note": "A Lidl oldala a terméket azonosítja, a makróérték külön ellenőrizendő"
+  },
+  {
+    "category": "Felvágott",
+    "name": "Pikok Pure sertésvirsli",
+    "kcal": 272.0,
+    "protein": 13.0,
+    "carbs": 1.0,
+    "fat": 24.0,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Pékáru",
+    "name": "Vemondo / Combino fehér tortilla wrap",
+    "kcal": 310.0,
+    "protein": 8.5,
+    "carbs": 54.0,
+    "fat": 6.5,
+    "unit": "100 g",
+    "note": "Darabonkénti tömeg később rögzítendő"
+  },
+  {
+    "category": "Pékáru",
+    "name": "Teljes kiőrlésű toast kenyér",
+    "kcal": 245.0,
+    "protein": 8.5,
+    "carbs": 41.0,
+    "fat": 3.5,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Pékáru",
+    "name": "Kenyér – átlag (kovászos/fehér vegyes)",
+    "kcal": 250.0,
+    "protein": 8.5,
+    "carbs": 49.0,
+    "fat": 2.5,
+    "unit": "100 g",
+    "note": "Átlagérték; konkrét rendszeres kenyérnél felülírható"
+  },
+  {
+    "category": "Protein",
+    "name": "Milbona High Protein Pudding",
+    "kcal": 76.0,
+    "protein": 10.0,
+    "carbs": 5.2,
+    "fat": 1.5,
+    "unit": "100 g",
+    "note": "200 g-os kiszerelés. Figyelem: 2026.08.19-i visszahívás egy konkrét csokis tételre (14.09.2026 lejárat)"
+  },
+  {
+    "category": "Protein",
+    "name": "BioTechUSA Iso Whey Zero – átlagos íz",
+    "kcal": 370.0,
+    "protein": 84.5,
+    "carbs": 3.8,
+    "fat": 1.8,
+    "unit": "100 g",
+    "note": "Ízenként kismértékben eltér; 25 g adag kb. 92–95 kcal, 21 g fehérje"
+  },
+  {
+    "category": "Szénhidrát",
+    "name": "BioTechUSA Rice Pudding – tejcsokoládé",
+    "kcal": 381.0,
+    "protein": 8.7,
+    "carbs": 68.0,
+    "fat": 7.9,
+    "unit": "100 g por",
+    "note": "1 adag 40 g = 152 kcal, 3,5 g fehérje"
+  },
+  {
+    "category": "Tejtermék",
+    "name": "Pilos ízesített joghurt – átlag",
+    "kcal": 95.0,
+    "protein": 3.5,
+    "carbs": 13.0,
+    "fat": 2.8,
+    "unit": "100 g",
+    "note": "Ízenként eltérhet"
+  },
+  {
+    "category": "Szénhidrát",
+    "name": "Crownfield zabkása-keverék – natúr alap",
+    "kcal": 360.0,
+    "protein": 12.0,
+    "carbs": 59.0,
+    "fat": 6.5,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Hús",
+    "name": "Csirkemell, nyers, bőr nélkül",
+    "kcal": 120.0,
+    "protein": 22.5,
+    "carbs": 0.0,
+    "fat": 2.6,
+    "unit": "100 g",
+    "note": "Nyers tömegre számolva"
+  },
+  {
+    "category": "Hús",
+    "name": "Pulykamell, nyers, bőr nélkül",
+    "kcal": 114.0,
+    "protein": 23.5,
+    "carbs": 0.0,
+    "fat": 1.5,
+    "unit": "100 g",
+    "note": "Nyers tömegre számolva"
+  },
+  {
+    "category": "Hús",
+    "name": "Sertéskaraj, sovány, nyers",
+    "kcal": 143.0,
+    "protein": 21.5,
+    "carbs": 0.0,
+    "fat": 6.0,
+    "unit": "100 g",
+    "note": "Zsírosság darabonként eltérhet"
+  },
+  {
+    "category": "Hús",
+    "name": "Csirkecomb, hús+bőr, nyers",
+    "kcal": 190.0,
+    "protein": 18.0,
+    "carbs": 0.0,
+    "fat": 13.0,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Hús",
+    "name": "Csirke felsőcomb, bőr nélkül",
+    "kcal": 145.0,
+    "protein": 19.5,
+    "carbs": 0.0,
+    "fat": 7.5,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Hús",
+    "name": "Csirkeszárny, nyers",
+    "kcal": 203.0,
+    "protein": 17.5,
+    "carbs": 0.0,
+    "fat": 14.5,
+    "unit": "100 g",
+    "note": "Csont miatt tényleges ehető mennyiség eltér"
+  },
+  {
+    "category": "Hús",
+    "name": "Sertéscomb, sovány, nyers",
+    "kcal": 145.0,
+    "protein": 21.0,
+    "carbs": 0.0,
+    "fat": 6.5,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Hús",
+    "name": "Tarja, nyers",
+    "kcal": 250.0,
+    "protein": 17.0,
+    "carbs": 0.0,
+    "fat": 20.0,
+    "unit": "100 g",
+    "note": "Zsírtartalma nagyon változó"
+  },
+  {
+    "category": "Hús",
+    "name": "Darált marha ~10% zsír",
+    "kcal": 176.0,
+    "protein": 20.0,
+    "carbs": 0.0,
+    "fat": 10.0,
+    "unit": "100 g",
+    "note": "Ha Lidl címkén más zsírszázalék van, ezt felülírjuk"
+  },
+  {
+    "category": "Hús",
+    "name": "Darált marha ~20% zsír",
+    "kcal": 254.0,
+    "protein": 17.0,
+    "carbs": 0.0,
+    "fat": 20.0,
+    "unit": "100 g",
+    "note": "Fontos alternatíva a zsírosabb bolti darálthúshoz"
+  },
+  {
+    "category": "Hús",
+    "name": "Hamburgerhús ~20% zsír",
+    "kcal": 250.0,
+    "protein": 17.0,
+    "carbs": 1.0,
+    "fat": 20.0,
+    "unit": "100 g",
+    "note": "Konkrét termékcímke előnyös"
+  },
+  {
+    "category": "Belsőség",
+    "name": "Csirkemáj, nyers",
+    "kcal": 119.0,
+    "protein": 17.0,
+    "carbs": 1.0,
+    "fat": 4.8,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Belsőség",
+    "name": "Sertésmáj, nyers",
+    "kcal": 134.0,
+    "protein": 21.0,
+    "carbs": 2.5,
+    "fat": 3.7,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Belsőség",
+    "name": "Csirkeszív, nyers",
+    "kcal": 153.0,
+    "protein": 15.5,
+    "carbs": 0.7,
+    "fat": 9.3,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Belsőség",
+    "name": "Csirkezúza, nyers",
+    "kcal": 94.0,
+    "protein": 18.0,
+    "carbs": 0.0,
+    "fat": 2.1,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Belsőség",
+    "name": "Pacal, főtt",
+    "kcal": 94.0,
+    "protein": 12.5,
+    "carbs": 0.0,
+    "fat": 4.0,
+    "unit": "100 g",
+    "note": "Elkészítési módtól jelentősen változhat"
+  },
+  {
+    "category": "Hal",
+    "name": "Tonhal konzerv, sós lében, lecsepegtetve",
+    "kcal": 116.0,
+    "protein": 25.5,
+    "carbs": 0.0,
+    "fat": 1.0,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Hal",
+    "name": "Lazac, nyers",
+    "kcal": 208.0,
+    "protein": 20.0,
+    "carbs": 0.0,
+    "fat": 13.0,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Tenger gyümölcsei",
+    "name": "Garnéla, főtt",
+    "kcal": 99.0,
+    "protein": 24.0,
+    "carbs": 0.2,
+    "fat": 0.3,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Tojás",
+    "name": "Tyúktojás, egész",
+    "kcal": 143.0,
+    "protein": 12.6,
+    "carbs": 0.7,
+    "fat": 9.5,
+    "unit": "100 g",
+    "note": "1 M-es tojás ehető része kb. 50–55 g"
+  },
+  {
+    "category": "Tojás",
+    "name": "Tojásfehérje",
+    "kcal": 52.0,
+    "protein": 10.9,
+    "carbs": 0.7,
+    "fat": 0.2,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Köret",
+    "name": "Fehér rizs, száraz",
+    "kcal": 360.0,
+    "protein": 7.0,
+    "carbs": 79.0,
+    "fat": 0.7,
+    "unit": "100 g száraz",
+    "note": "A recepteknél száraz tömeggel számoljunk"
+  },
+  {
+    "category": "Köret",
+    "name": "Basmati rizs, száraz",
+    "kcal": 356.0,
+    "protein": 8.5,
+    "carbs": 78.0,
+    "fat": 0.9,
+    "unit": "100 g száraz",
+    "note": ""
+  },
+  {
+    "category": "Köret",
+    "name": "Jázmin rizs, száraz",
+    "kcal": 356.0,
+    "protein": 7.0,
+    "carbs": 80.0,
+    "fat": 0.7,
+    "unit": "100 g száraz",
+    "note": ""
+  },
+  {
+    "category": "Köret",
+    "name": "Burgonya, nyers",
+    "kcal": 77.0,
+    "protein": 2.0,
+    "carbs": 17.0,
+    "fat": 0.1,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Köret",
+    "name": "Édesburgonya, nyers",
+    "kcal": 86.0,
+    "protein": 1.6,
+    "carbs": 20.1,
+    "fat": 0.1,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Köret",
+    "name": "Száraztészta, átlag",
+    "kcal": 355.0,
+    "protein": 12.0,
+    "carbs": 72.0,
+    "fat": 1.5,
+    "unit": "100 g száraz",
+    "note": ""
+  },
+  {
+    "category": "Köret",
+    "name": "Zabpehely",
+    "kcal": 370.0,
+    "protein": 13.0,
+    "carbs": 60.0,
+    "fat": 7.0,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Köret",
+    "name": "Müzli – átlag",
+    "kcal": 380.0,
+    "protein": 9.0,
+    "carbs": 68.0,
+    "fat": 8.0,
+    "unit": "100 g",
+    "note": "Konkrét Crownfield terméknél címke javasolt"
+  },
+  {
+    "category": "Köret",
+    "name": "Cornflakes – átlag",
+    "kcal": 370.0,
+    "protein": 7.0,
+    "carbs": 84.0,
+    "fat": 1.0,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Zöldség",
+    "name": "Paradicsom",
+    "kcal": 18.0,
+    "protein": 0.9,
+    "carbs": 3.9,
+    "fat": 0.2,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Zöldség",
+    "name": "TV paprika / kaliforniai paprika – átlag",
+    "kcal": 25.0,
+    "protein": 1.0,
+    "carbs": 5.5,
+    "fat": 0.3,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Zöldség",
+    "name": "Kígyóuborka",
+    "kcal": 15.0,
+    "protein": 0.7,
+    "carbs": 3.6,
+    "fat": 0.1,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Zöldség",
+    "name": "Vöröshagyma",
+    "kcal": 40.0,
+    "protein": 1.1,
+    "carbs": 9.3,
+    "fat": 0.1,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Zöldség",
+    "name": "Jégsaláta",
+    "kcal": 14.0,
+    "protein": 0.9,
+    "carbs": 3.0,
+    "fat": 0.1,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Zöldség",
+    "name": "Fejes káposzta",
+    "kcal": 25.0,
+    "protein": 1.3,
+    "carbs": 5.8,
+    "fat": 0.1,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Zöldség",
+    "name": "Sárgarépa",
+    "kcal": 41.0,
+    "protein": 0.9,
+    "carbs": 9.6,
+    "fat": 0.2,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Zöldség",
+    "name": "Brokkoli",
+    "kcal": 34.0,
+    "protein": 2.8,
+    "carbs": 6.6,
+    "fat": 0.4,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Zöldség",
+    "name": "Karfiol",
+    "kcal": 25.0,
+    "protein": 1.9,
+    "carbs": 5.0,
+    "fat": 0.3,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Zöldség",
+    "name": "Cukkini",
+    "kcal": 17.0,
+    "protein": 1.2,
+    "carbs": 3.1,
+    "fat": 0.3,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Zöldség",
+    "name": "Csiperkegomba",
+    "kcal": 22.0,
+    "protein": 3.1,
+    "carbs": 3.3,
+    "fat": 0.3,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Zöldség",
+    "name": "Zöldborsó",
+    "kcal": 81.0,
+    "protein": 5.4,
+    "carbs": 14.5,
+    "fat": 0.4,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Zöldség",
+    "name": "Csemegekukorica",
+    "kcal": 86.0,
+    "protein": 3.2,
+    "carbs": 19.0,
+    "fat": 1.2,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Zöldség",
+    "name": "Spenót",
+    "kcal": 23.0,
+    "protein": 2.9,
+    "carbs": 3.6,
+    "fat": 0.4,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Zöldség",
+    "name": "Csemegeuborka",
+    "kcal": 12.0,
+    "protein": 0.5,
+    "carbs": 2.3,
+    "fat": 0.2,
+    "unit": "100 g",
+    "note": "Cukrozott lé esetén több lehet"
+  },
+  {
+    "category": "Gyümölcs",
+    "name": "Banán",
+    "kcal": 89.0,
+    "protein": 1.1,
+    "carbs": 22.8,
+    "fat": 0.3,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Gyümölcs",
+    "name": "Alma",
+    "kcal": 52.0,
+    "protein": 0.3,
+    "carbs": 13.8,
+    "fat": 0.2,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Gyümölcs",
+    "name": "Narancs",
+    "kcal": 47.0,
+    "protein": 0.9,
+    "carbs": 11.8,
+    "fat": 0.1,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Gyümölcs",
+    "name": "Szőlő",
+    "kcal": 69.0,
+    "protein": 0.7,
+    "carbs": 18.1,
+    "fat": 0.2,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Gyümölcs",
+    "name": "Eper",
+    "kcal": 32.0,
+    "protein": 0.7,
+    "carbs": 7.7,
+    "fat": 0.3,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Gyümölcs",
+    "name": "Áfonya",
+    "kcal": 57.0,
+    "protein": 0.7,
+    "carbs": 14.5,
+    "fat": 0.3,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Gyümölcs",
+    "name": "Görögdinnye",
+    "kcal": 30.0,
+    "protein": 0.6,
+    "carbs": 7.6,
+    "fat": 0.2,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Gyümölcs",
+    "name": "Őszibarack",
+    "kcal": 39.0,
+    "protein": 0.9,
+    "carbs": 9.5,
+    "fat": 0.3,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Szósz",
+    "name": "Ketchup – átlag",
+    "kcal": 112.0,
+    "protein": 1.3,
+    "carbs": 26.0,
+    "fat": 0.2,
+    "unit": "100 g",
+    "note": "Konkrét Lidl terméknél címke jobb"
+  },
+  {
+    "category": "Szósz",
+    "name": "Light ketchup – átlag",
+    "kcal": 55.0,
+    "protein": 1.0,
+    "carbs": 12.0,
+    "fat": 0.2,
+    "unit": "100 g",
+    "note": "Címke javasolt, ha rendszeres"
+  },
+  {
+    "category": "Szósz",
+    "name": "Majonéz – átlag",
+    "kcal": 680.0,
+    "protein": 1.0,
+    "carbs": 1.0,
+    "fat": 75.0,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Szósz",
+    "name": "Light majonéz – átlag",
+    "kcal": 300.0,
+    "protein": 1.0,
+    "carbs": 7.0,
+    "fat": 28.0,
+    "unit": "100 g",
+    "note": "Márkánként erősen eltér"
+  },
+  {
+    "category": "Szósz",
+    "name": "Mustár",
+    "kcal": 66.0,
+    "protein": 4.4,
+    "carbs": 5.8,
+    "fat": 3.3,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Szósz",
+    "name": "BBQ szósz – átlag",
+    "kcal": 170.0,
+    "protein": 1.0,
+    "carbs": 40.0,
+    "fat": 0.5,
+    "unit": "100 g",
+    "note": "Címke javasolt, ha rendszeres"
+  },
+  {
+    "category": "Zsiradék",
+    "name": "Olívaolaj",
+    "kcal": 884.0,
+    "protein": 0.0,
+    "carbs": 0.0,
+    "fat": 100.0,
+    "unit": "100 g",
+    "note": "1 evőkanál kb. 10–14 g"
+  },
+  {
+    "category": "Desszert",
+    "name": "Häagen-Dazs fagylalt – általános prémium átlag",
+    "kcal": 260.0,
+    "protein": 4.0,
+    "carbs": 25.0,
+    "fat": 16.0,
+    "unit": "100 g",
+    "note": "Konkrét íz szerint érdemes felülírni"
+  },
+  {
+    "category": "Desszert",
+    "name": "Túró Rudi – átlag",
+    "kcal": 360.0,
+    "protein": 9.0,
+    "carbs": 38.0,
+    "fat": 19.0,
+    "unit": "100 g",
+    "note": "Márkánként eltér"
+  },
+  {
+    "category": "Desszert",
+    "name": "Étcsokoládé ~70%",
+    "kcal": 600.0,
+    "protein": 8.0,
+    "carbs": 46.0,
+    "fat": 43.0,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Nasi",
+    "name": "Chips – átlag",
+    "kcal": 530.0,
+    "protein": 6.0,
+    "carbs": 52.0,
+    "fat": 33.0,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Nasi",
+    "name": "Popcorn, natúr/pattogatott – átlag",
+    "kcal": 390.0,
+    "protein": 12.0,
+    "carbs": 78.0,
+    "fat": 4.5,
+    "unit": "100 g",
+    "note": "Olaj/vaj jelentősen emelheti"
+  },
+  {
+    "category": "Ital",
+    "name": "Coca-Cola / cukros kóla",
+    "kcal": 42.0,
+    "protein": 0.0,
+    "carbs": 10.6,
+    "fat": 0.0,
+    "unit": "100 ml",
+    "note": ""
+  },
+  {
+    "category": "Ital",
+    "name": "Zero üdítő – átlag",
+    "kcal": 0.0,
+    "protein": 0.0,
+    "carbs": 0.0,
+    "fat": 0.0,
+    "unit": "100 ml",
+    "note": "Gyakorlatilag 0–2 kcal/100 ml"
+  },
+  {
+    "category": "Ital",
+    "name": "Narancslé 100% – átlag",
+    "kcal": 45.0,
+    "protein": 0.7,
+    "carbs": 10.4,
+    "fat": 0.2,
+    "unit": "100 ml",
+    "note": ""
+  },
+  {
+    "category": "Köret",
+    "name": "Barna rizs, száraz",
+    "kcal": 350.0,
+    "protein": 7.5,
+    "carbs": 75.0,
+    "fat": 2.7,
+    "unit": "100 g száraz",
+    "note": ""
+  },
+  {
+    "category": "Zöldség",
+    "name": "Fagyasztott zöldségkeverék – átlag",
+    "kcal": 55.0,
+    "protein": 3.0,
+    "carbs": 8.0,
+    "fat": 1.0,
+    "unit": "100 g",
+    "note": "Mexikói/ázsiai mix között eltérhet"
+  },
+  {
+    "category": "Tejtermék",
+    "name": "Pilos tejföl 12% – átlag",
+    "kcal": 134.0,
+    "protein": 3.0,
+    "carbs": 4.0,
+    "fat": 12.0,
+    "unit": "100 g",
+    "note": "Konkrét címke később pontosítható"
+  },
+  {
+    "category": "Hús",
+    "name": "Csirkemell darált – standard",
+    "kcal": 120.0,
+    "protein": 22.5,
+    "carbs": 0.0,
+    "fat": 2.6,
+    "unit": "100 g",
+    "note": "Csirkemellből darálva"
+  },
+  {
+    "category": "Szósz",
+    "name": "Passata – átlag",
+    "kcal": 30.0,
+    "protein": 1.5,
+    "carbs": 5.0,
+    "fat": 0.2,
+    "unit": "100 g",
+    "note": "Paradicsom passata"
+  },
+  {
+    "category": "Köret",
+    "name": "Bulgur, száraz",
+    "kcal": 342.0,
+    "protein": 12.3,
+    "carbs": 63.4,
+    "fat": 1.3,
+    "unit": "100 g száraz",
+    "note": ""
+  },
+  {
+    "category": "Hüvelyes",
+    "name": "Vörösbab konzerv, lecsepegtetve",
+    "kcal": 95.0,
+    "protein": 6.5,
+    "carbs": 14.0,
+    "fat": 0.5,
+    "unit": "100 g",
+    "note": "Márkánként eltérhet"
+  },
+  {
+    "category": "Zsiradék",
+    "name": "Vaj",
+    "kcal": 717.0,
+    "protein": 0.9,
+    "carbs": 0.1,
+    "fat": 81.1,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Desszert alap",
+    "name": "Teljes kiőrlésű keksz – átlag",
+    "kcal": 430.0,
+    "protein": 8.0,
+    "carbs": 68.0,
+    "fat": 14.0,
+    "unit": "100 g",
+    "note": "Konkrét Lidl keksznél címke javasolt"
+  },
+  {
+    "category": "Gyümölcs",
+    "name": "Málna",
+    "kcal": 52.0,
+    "protein": 1.2,
+    "carbs": 11.9,
+    "fat": 0.7,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Köret",
+    "name": "Zabliszt",
+    "kcal": 370.0,
+    "protein": 13.0,
+    "carbs": 60.0,
+    "fat": 7.0,
+    "unit": "100 g",
+    "note": "Darált zabpehely értékével számolva"
+  },
+  {
+    "category": "Desszert alap",
+    "name": "Kakaópor, zsírszegény",
+    "kcal": 230.0,
+    "protein": 20.0,
+    "carbs": 14.0,
+    "fat": 11.0,
+    "unit": "100 g",
+    "note": "Kis mennyiség miatt alacsony hatás"
+  },
+  {
+    "category": "Desszert alap",
+    "name": "Babapiskóta – átlag",
+    "kcal": 390.0,
+    "protein": 8.0,
+    "carbs": 78.0,
+    "fat": 5.0,
+    "unit": "100 g",
+    "note": "Márkánként eltérhet"
+  },
+  {
+    "category": "Desszert alap",
+    "name": "Kókuszreszelék",
+    "kcal": 660.0,
+    "protein": 7.0,
+    "carbs": 24.0,
+    "fat": 65.0,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Mag / dió",
+    "name": "Mandula",
+    "kcal": 579.0,
+    "protein": 21.2,
+    "carbs": 21.6,
+    "fat": 49.9,
+    "unit": "100 g",
+    "note": ""
+  },
+  {
+    "category": "Gyümölcs",
+    "name": "Erdei gyümölcs mix, fagyasztott – átlag",
+    "kcal": 45.0,
+    "protein": 1.0,
+    "carbs": 9.0,
+    "fat": 0.5,
+    "unit": "100 g",
+    "note": "Összetételtől függ"
+  },
+  {
+    "category": "Mag / dió",
+    "name": "Mogyoróvaj 100% – átlag",
+    "kcal": 588.0,
+    "protein": 25.0,
+    "carbs": 20.0,
+    "fat": 50.0,
+    "unit": "100 g",
+    "note": "Konkrét Lidl terméknél címke javasolt"
+  }
+]
