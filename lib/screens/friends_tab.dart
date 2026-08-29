@@ -15,8 +15,8 @@ class _FriendsTabState extends State<FriendsTab> {
   final List<FriendProfile> _friends = [
     FriendProfile(
       id: '1',
-      inviteCode: 'FUTY-BALA-1102',
-      name: 'Kovács Balázs',
+      inviteCode: 'FUTY-Imre-1102',
+      name: 'Füty Imre',
       avatar: 'KB',
       currentWeight: 84.2,
       weightChange: -1.6,
@@ -43,8 +43,8 @@ class _FriendsTabState extends State<FriendsTab> {
     ),
     FriendProfile(
       id: '2',
-      inviteCode: 'FUTY-ZSOF-3391',
-      name: 'Nagy Zsófia',
+      inviteCode: 'FUTY-KAL-3391',
+      name: 'Kala Pál',
       avatar: 'NZS',
       currentWeight: 67.1,
       weightChange: -0.9,
