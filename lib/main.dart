@@ -1,28 +1,15 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'screens/home_screen.dart';
-import 'services/notification_service.dart';
+import 'screens/main_layout.dart';
 import 'services/theme_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-  ]);
-
-  try {
-    await NotificationService.init();
-  } catch (_) {
-    // Ha az inicializálás nem sikerül háttérben, az app ettől még indul
-  }
   await ThemeService().init();
-
-  runApp(const DagiFitnessApp());
+  runApp(const DagiApp());
 }
 
-class DagiFitnessApp extends StatelessWidget {
-  const DagiFitnessApp({super.key});
+class DagiApp extends StatelessWidget {
+  const DagiApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -30,21 +17,16 @@ class DagiFitnessApp extends StatelessWidget {
       animation: ThemeService(),
       builder: (context, _) {
         return MaterialApp(
-          title: 'Dagi App',
+          title: 'Dagi app',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
-            brightness: Brightness.dark,
-            scaffoldBackgroundColor: const Color(0xFF07101B),
-            colorScheme: ColorScheme.dark(
-              primary: ThemeService().primaryColor,
-              secondary: ThemeService().secondaryColor,
-              surface: ThemeService().cardColor,
-            ),
-            useMaterial3: true,
+            scaffoldBackgroundColor: ThemeService().backgroundColor,
+            primaryColor: ThemeService().primaryColor,
+            appBarTheme: AppBarTheme(backgroundColor: ThemeService().backgroundColor),
           ),
-          home: const MainNavigationScreen(),
+          home: const MainLayout(),
         );
-      },
+      }
     );
   }
 }
