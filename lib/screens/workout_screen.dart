@@ -16,7 +16,7 @@ class WorkoutScreen extends StatefulWidget {
 }
 
 class _WorkoutScreenState extends State<WorkoutScreen> {
-  String? _activeCategory; // Ha null, akkor a kategóriakártyák látszódnak (mint a képen)
+  String? _activeCategory;
   late List<Exercise> _exercises;
   final Map<String, String?> _categoryImages = {};
   final ImagePicker _picker = ImagePicker();
@@ -55,7 +55,6 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     final theme = ThemeService();
     final appState = context.watch<AppState>();
 
-    // Ha nincs kiválasztva kategória, a képen látható stílusú nagykártyás menüt mutatjuk
     if (_activeCategory == null) {
       return ListView(
         padding: const EdgeInsets.all(16),
@@ -63,8 +62,8 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
           const Text('Milyen pusztítást végzünk ma?', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 16),
           ..._categories.map((cat) {
-            final imgPath = _categoryImages[cat];
-            final count = _exercises.where((e) => e.category == cat).length;
+            final String? imgPath = _categoryImages[cat];
+            final int count = _exercises.where((Exercise e) => e.category == cat).length;
             return GestureDetector(
               onTap: () => setState(() => _activeCategory = cat),
               child: Container(
@@ -129,8 +128,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
       );
     }
 
-    // Ha ki van választva egy kategória, megjelennek a gyakorlatok
-    final filteredExercises = _exercises.where((e) => e.category == _activeCategory).toList();
+    final List<Exercise> filteredExercises = _exercises.where((Exercise e) => e.category == _activeCategory).toList();
 
     return Column(
       children: [
@@ -152,7 +150,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             itemCount: filteredExercises.length,
             itemBuilder: (context, index) {
-              final ex = filteredExercises[index];
+              final Exercise ex = filteredExercises[index];
               return Container(
                 margin: const EdgeInsets.only(bottom: 12),
                 padding: const EdgeInsets.all(16),
