@@ -13,6 +13,7 @@ class _ProgressTabState extends State<ProgressTab> {
   final ThemeService _theme = ThemeService();
   double _currentWeight = 78.5;
   double _targetWeight = 75.0;
+  List<double> _weightHistory = [81.0, 80.2, 79.4, 78.5];
 
   @override
   void initState() {
@@ -37,7 +38,7 @@ class _ProgressTabState extends State<ProgressTab> {
           backgroundColor: _theme.backgroundColor,
           appBar: AppBar(
             backgroundColor: _theme.backgroundColor,
-            title: const Text('Dagi app • Fejlődés', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
+            title: const Text('Dagi app • Fejlődés & Grafikok', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
           ),
           body: ListView(
             padding: const EdgeInsets.all(16),
@@ -75,17 +76,34 @@ class _ProgressTabState extends State<ProgressTab> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('EDZÉSMÚLT ÉS STATISZTIKA', style: TextStyle(color: Color(0xFF91A2B5), fontWeight: FontWeight.w900, fontSize: 12)),
-                    const SizedBox(height: 12),
-                    ListTile(
-                      leading: Icon(Icons.local_fire_department_rounded, color: _theme.primaryColor),
-                      title: const Text('Elvégzett edzések ebben a hónapban', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                      trailing: const Text('14 alkalom', style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold)),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.bolt_rounded, color: _theme.secondaryColor),
-                      title: const Text('Összes elégetett kalória', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                      trailing: const Text('6,850 kcal', style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold)),
+                    const Text('HETI SÚLYVÁLTOZÁS TREND (GRAFIKON)', style: TextStyle(color: Color(0xFF91A2B5), fontWeight: FontWeight.w900, fontSize: 12)),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      height: 120,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: _weightHistory.map((w) {
+                          final heightFactor = ((w - 70) / 15).clamp(0.2, 1.0);
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text('$w kg', style: const TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.bold)),
+                              const SizedBox(height: 6),
+                              Container(
+                                width: 32,
+                                height: heightFactor * 80,
+                                decoration: BoxDecoration(
+                                  color: _theme.primaryColor,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              const Text('Mérés', style: TextStyle(color: Color(0xFF91A2B5), fontSize: 10)),
+                            ],
+                          );
+                        }).toList(),
+                      ),
                     ),
                   ],
                 ),
