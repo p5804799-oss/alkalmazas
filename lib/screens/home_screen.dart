@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'dashboard_tab.dart';
-import 'friends_tab.dart';
-import 'recipes_tab.dart';
-import 'foods_tab.dart';
+import 'activity_tracker_tab.dart';
+import 'workout_tracker_tab.dart';
 import 'trend_tab.dart';
+import 'foods_tab.dart';
+import 'recipes_tab.dart';
+import 'friends_tab.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -17,10 +19,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   final List<Widget> _screens = const [
     DashboardTab(),
-    FriendsTab(),
-    RecipesTab(),
-    FoodsTab(),
+    ActivityTrackerTab(),
+    WorkoutTrackerTab(),
     TrendTab(),
+    FoodsTab(),
+    RecipesTab(),
+    FriendsTab(),
   ];
 
   void _onTabChanged(int index) {
@@ -44,26 +48,36 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         backgroundColor: const Color(0xFF0D1825),
         selectedItemColor: const Color(0xFF28D5CF),
         unselectedItemColor: const Color(0xFF91A2B5),
+        selectedFontSize: 10,
+        unselectedFontSize: 9,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard_rounded),
             label: 'Főoldal',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.people_rounded),
-            label: 'Barátok',
+            icon: Icon(Icons.water_drop_rounded),
+            label: 'Aktivitás',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.restaurant_menu_rounded),
-            label: 'Receptek',
+            icon: Icon(Icons.fitness_center_rounded),
+            label: 'Edzés Súlyok',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.trending_up_rounded),
+            label: 'Testsúly',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.fastfood_rounded),
             label: 'Ételek',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.trending_up_rounded),
-            label: 'Trendek',
+            icon: Icon(Icons.restaurant_menu_rounded),
+            label: 'Receptek',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people_rounded),
+            label: 'Közösség',
           ),
         ],
       ),

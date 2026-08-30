@@ -1,32 +1,46 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'screens/home_screen.dart';
+import 'services/notification_service.dart';
+import 'services/theme_service.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const FutyFitnessApp());
+  
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
+
+  await NotificationService.initNotification();
+  await ThemeService().init();
+
+  runApp(const DagiFitnessApp());
 }
 
-class FutyFitnessApp extends StatelessWidget {
-  const FutyFitnessApp({super.key});
+class DagiFitnessApp extends StatelessWidget {
+  const DagiFitnessApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Fütyfürütty',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF0B101B),
-        textTheme: GoogleFonts.plusJakartaSansTextTheme(ThemeData.dark().textTheme),
-        colorScheme: const ColorScheme.dark(
-          primary: Color(0xFFFF2E63),
-          secondary: Color(0xFF00E5FF),
-          surface: Color(0xFF131B2E),
-        ),
-      ),
-      home: const MainNavigationScreen(),
+    return AnimatedBuilder(
+      animation: ThemeService(),
+      builder: (context, _) {
+        return MaterialApp(
+          title: 'Dagi App',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            brightness: Brightness.dark,
+            scaffoldBackgroundColor: const Color(0xFF07101B),
+            colorScheme: ColorScheme.dark(
+              primary: ThemeService().primaryColor,
+              secondary: ThemeService().secondaryColor,
+              surface: ThemeService().cardColor,
+            ),
+            useMaterial3: true,
+          ),
+          home: const MainNavigationScreen(),
+        );
+      },
     );
   }
 }

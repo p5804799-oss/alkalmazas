@@ -1,39 +1,113 @@
-﻿import 'dart:convert';
+﻿@'
+import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ExerciseLogEntry {
-  final String id;
-  final String exerciseName;
-  final double weightKg;
-  final int reps;
-  final DateTime date;
+class RoutineExercise {
+  final String name;
+  final int defaultSets;
+  final int defaultReps;
 
-  ExerciseLogEntry({
-    required this.id,
-    required this.exerciseName,
-    required this.weightKg,
-    required this.reps,
-    required this.date,
+  const RoutineExercise({
+    required this.name,
+    required this.defaultSets,
+    required this.defaultReps,
   });
-
-  Map<String, dynamic> toMap() => {
-        'id': id,
-        'exerciseName': exerciseName,
-        'weightKg': weightKg,
-        'reps': reps,
-        'date': date.toIso8601String(),
-      };
-
-  factory ExerciseLogEntry.fromMap(Map<String, dynamic> map) => ExerciseLogEntry(
-        id: map['id'] ?? UniqueKey().toString(),
-        exerciseName: map['exerciseName'] ?? 'Ismeretlen',
-        weightKg: (map['weightKg'] as num).toDouble(),
-        reps: map['reps'] ?? 0,
-        date: DateTime.parse(map['date']),
-      );
 }
+
+class WorkoutCategory {
+  final String id;
+  final String title;
+  final String subtitle;
+  final String iconBadge;
+  final List<RoutineExercise> exercises;
+
+  const WorkoutCategory({
+    required this.id,
+    required this.title,
+    required this.subtitle,
+    required this.iconBadge,
+    required this.exercises,
+  });
+}
+
+const List<WorkoutCategory> kWorkoutCategories = [
+  WorkoutCategory(
+    id: 'push',
+    title: 'PUSH',
+    subtitle: 'Mell • Váll • Tricepsz',
+    iconBadge: '↗',
+    exercises: [
+      RoutineExercise(name: 'Fekvenyomás rúddal', defaultSets: 4, defaultReps: 8),
+      RoutineExercise(name: 'Döntött padú kézisúlyzós nyomás', defaultSets: 4, defaultReps: 10),
+      RoutineExercise(name: 'Tárogatás alsó/felső csigán', defaultSets: 3, defaultReps: 12),
+      RoutineExercise(name: 'Vállból nyomás kézisúlyzóval', defaultSets: 4, defaultReps: 8),
+      RoutineExercise(name: 'Oldalemelés kézisúlyzóval', defaultSets: 4, defaultReps: 15),
+      RoutineExercise(name: 'Tolódzkodás padon/korláton', defaultSets: 3, defaultReps: 10),
+      RoutineExercise(name: 'Tricepsz letolás csigán kötéllel', defaultSets: 4, defaultReps: 12),
+      RoutineExercise(name: 'Koponyatörő (Francia nyomás)', defaultSets: 3, defaultReps: 10),
+    ],
+  ),
+  WorkoutCategory(
+    id: 'pull',
+    title: 'PULL',
+    subtitle: 'Hát • Trapéz • Bicepsz',
+    iconBadge: '↙',
+    exercises: [
+      RoutineExercise(name: 'Húzódzkodás / Széles lehúzás', defaultSets: 4, defaultReps: 8),
+      RoutineExercise(name: 'Döntött törzsű evezés', defaultSets: 4, defaultReps: 8),
+      RoutineExercise(name: 'Evezés alsó csigán szűken', defaultSets: 3, defaultReps: 12),
+      RoutineExercise(name: 'Fűnyíró evezés egykezessel', defaultSets: 3, defaultReps: 10),
+      RoutineExercise(name: 'Face pull kötéllel', defaultSets: 4, defaultReps: 15),
+      RoutineExercise(name: 'Bicepsz állva francia rúddal', defaultSets: 4, defaultReps: 10),
+      RoutineExercise(name: 'Kalapács bicepsz kézisúlyzóval', defaultSets: 3, defaultReps: 12),
+      RoutineExercise(name: 'Scott pados bicepsz', defaultSets: 3, defaultReps: 10),
+    ],
+  ),
+  WorkoutCategory(
+    id: 'leg',
+    title: 'LEG',
+    subtitle: 'Comb • Vádli • Has',
+    iconBadge: '⚡',
+    exercises: [
+      RoutineExercise(name: 'Guggolás rúddal', defaultSets: 4, defaultReps: 8),
+      RoutineExercise(name: 'Lábtoló gép', defaultSets: 4, defaultReps: 10),
+      RoutineExercise(name: 'Combhajlító gép fekve', defaultSets: 4, defaultReps: 12),
+      RoutineExercise(name: 'Combfeszítő gép', defaultSets: 3, defaultReps: 12),
+      RoutineExercise(name: 'Bolgár guggolás', defaultSets: 3, defaultReps: 10),
+      RoutineExercise(name: 'Álló vádliemelés', defaultSets: 5, defaultReps: 15),
+      RoutineExercise(name: 'Függeszkedve lábemelés', defaultSets: 4, defaultReps: 15),
+    ],
+  ),
+  WorkoutCategory(
+    id: 'upper',
+    title: 'UPPER',
+    subtitle: 'PUSH + PULL bankból • 1 terv',
+    iconBadge: '◆',
+    exercises: [
+      RoutineExercise(name: 'Fekvenyomás rúddal', defaultSets: 3, defaultReps: 8),
+      RoutineExercise(name: 'Döntött törzsű evezés', defaultSets: 3, defaultReps: 8),
+      RoutineExercise(name: 'Vállból nyomás kézisúlyzóval', defaultSets: 3, defaultReps: 10),
+      RoutineExercise(name: 'Lehúzás mellhez szélesen', defaultSets: 3, defaultReps: 10),
+      RoutineExercise(name: 'Bicepsz állva rúddal', defaultSets: 3, defaultReps: 12),
+      RoutineExercise(name: 'Tricepsz letolás csigán', defaultSets: 3, defaultReps: 12),
+    ],
+  ),
+  WorkoutCategory(
+    id: 'lower',
+    title: 'LOWER',
+    subtitle: 'Alsótest & Törzserő • 1 terv',
+    iconBadge: '▼',
+    exercises: [
+      RoutineExercise(name: 'Guggolás rúddal', defaultSets: 4, defaultReps: 8),
+      RoutineExercise(name: 'Román felhúzás', defaultSets: 4, defaultReps: 10),
+      RoutineExercise(name: 'Lábtoló gép', defaultSets: 3, defaultReps: 12),
+      RoutineExercise(name: 'Ülő vádliemelés', defaultSets: 4, defaultReps: 15),
+      RoutineExercise(name: 'Plank súllyal', defaultSets: 3, defaultReps: 60),
+    ],
+  ),
+];
 
 class WorkoutTrackerTab extends StatefulWidget {
   const WorkoutTrackerTab({super.key});
@@ -43,66 +117,218 @@ class WorkoutTrackerTab extends StatefulWidget {
 }
 
 class _WorkoutTrackerTabState extends State<WorkoutTrackerTab> {
-  final List<ExerciseLogEntry> _allEntries = [];
-  String _selectedExercise = 'Fekvenyomás';
-  bool _isLoading = true;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF07101B),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF07101B),
+        elevation: 0,
+        title: Row(
+          children: [
+            RichText(
+              text: const TextSpan(
+                text: 'Füty',
+                style: TextStyle(color: Color(0xFF28D5CF), fontSize: 22, fontWeight: FontWeight.w900),
+                children: [
+                  TextSpan(text: 'fürütty', style: TextStyle(color: Color(0xFFFF356D))),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Milyen pusztítást végzünk ma?',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 22,
+                fontWeight: FontWeight.w900,
+                letterSpacing: -0.5,
+              ),
+            ),
+            const SizedBox(height: 18),
+            ...kWorkoutCategories.map((cat) => _buildWorkoutCard(context, cat)),
+          ],
+        ),
+      ),
+    );
+  }
 
-  final List<String> _defaultExercises = [
-    'Fekvenyomás',
-    'Guggolás',
-    'Felhúzás',
-    'Vállból nyomás',
-    'Bicepsz állva',
-    'Tricepsz letolás',
-    'Húzódzkodás',
-    'Evezés döntött törzzsel',
-  ];
+  Widget _buildWorkoutCard(BuildContext context, WorkoutCategory cat) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 14),
+      height: 120,
+      decoration: BoxDecoration(
+        color: const Color(0xFF0D1825),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: const Color(0xFF1F2F42), width: 1.5),
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFF142233),
+            const Color(0xFF0A121D).withValues(alpha: 0.9),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(22),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (ctx) => WorkoutDetailScreen(category: cat),
+              ),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      cat.title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 32,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${cat.exercises.length} gyakorlat • ${cat.subtitle}',
+                      style: const TextStyle(
+                        color: Color(0xFF91A2B5),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text(
+                      cat.iconBadge,
+                      style: const TextStyle(
+                        color: Color(0xFF28D5CF),
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Icon(
+                      Icons.arrow_forward_rounded,
+                      color: Color(0xFF28D5CF),
+                      size: 26,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class WorkoutDetailScreen extends StatefulWidget {
+  final WorkoutCategory category;
+
+  const WorkoutDetailScreen({super.key, required this.category});
+
+  @override
+  State<WorkoutDetailScreen> createState() => _WorkoutDetailScreenState();
+}
+
+class _WorkoutDetailScreenState extends State<WorkoutDetailScreen> {
+  Map<String, double> _lastWeights = {};
+  Map<String, int> _completedSets = {};
+  Timer? _restTimer;
+  int _restSecondsRemaining = 0;
+  bool _isRestActive = false;
 
   @override
   void initState() {
     super.initState();
-    _loadExerciseLogs();
+    _loadPreviousWeights();
   }
 
-  Future<void> _loadExerciseLogs() async {
+  @override
+  void dispose() {
+    _restTimer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _loadPreviousWeights() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? rawData = prefs.getString('exercise_progress_logs');
-    if (rawData != null && rawData.isNotEmpty) {
-      final List<dynamic> decoded = jsonDecode(rawData);
-      _allEntries.clear();
-      _allEntries.addAll(decoded.map((e) => ExerciseLogEntry.fromMap(e)).toList());
+    final String? rawLogs = prefs.getString('exercise_progress_logs');
+    final Map<String, double> weights = {};
+
+    if (rawLogs != null && rawLogs.isNotEmpty) {
+      final List<dynamic> logs = jsonDecode(rawLogs);
+      for (final ex in widget.category.exercises) {
+        final matches = logs.where((e) =>
+            (e['exerciseName'] as String).toLowerCase() == ex.name.toLowerCase()).toList();
+        if (matches.isNotEmpty) {
+          matches.sort((a, b) =>
+              DateTime.parse(b['date']).compareTo(DateTime.parse(a['date'])));
+          weights[ex.name] = (matches.first['weightKg'] as num).toDouble();
+        }
+      }
     }
+
     setState(() {
-      _isLoading = false;
+      _lastWeights = weights;
     });
   }
 
-  Future<void> _saveExerciseLogs() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String rawData = jsonEncode(_allEntries.map((e) => e.toMap()).toList());
-    await prefs.setString('exercise_progress_logs', rawData);
+  void _startRestTimer(int seconds) {
+    _restTimer?.cancel();
+    setState(() {
+      _restSecondsRemaining = seconds;
+      _isRestActive = true;
+    });
+
+    _restTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_restSecondsRemaining > 0) {
+        setState(() {
+          _restSecondsRemaining--;
+        });
+      } else {
+        timer.cancel();
+        setState(() {
+          _isRestActive = false;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Pihenőidő letelt! Mehet a következő széria! 💪'),
+              backgroundColor: Color(0xFF28D5CF),
+            ),
+          );
+        }
+      }
+    });
   }
 
-  List<ExerciseLogEntry> get _filteredEntries {
-    final list = _allEntries
-        .where((e) => e.exerciseName.toLowerCase() == _selectedExercise.toLowerCase())
-        .toList();
-    list.sort((a, b) => b.date.compareTo(a.date));
-    return list;
-  }
-
-  List<String> get _availableExercises {
-    final set = <String>{..._defaultExercises};
-    for (final e in _allEntries) {
-      set.add(e.exerciseName);
-    }
-    return set.toList();
-  }
-
-  void _showAddLogDialog() {
-    final nameCtrl = TextEditingController(text: _selectedExercise);
-    final weightCtrl = TextEditingController();
-    final repsCtrl = TextEditingController(text: '8');
+  void _logSetDialog(RoutineExercise exercise) {
+    final lastW = _lastWeights[exercise.name] ?? 0.0;
+    final weightCtrl = TextEditingController(text: lastW > 0 ? lastW.toString() : '');
+    final repsCtrl = TextEditingController(text: exercise.defaultReps.toString());
 
     showDialog(
       context: context,
@@ -118,45 +344,26 @@ class _WorkoutTrackerTabState extends State<WorkoutTrackerTab> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Új Súly Rögzítése Gyakorlathoz',
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
+              Text(
+                exercise.name,
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 17),
               ),
-              const SizedBox(height: 14),
-              TextField(
-                controller: nameCtrl,
-                style: const TextStyle(color: Colors.white, fontSize: 14),
-                decoration: InputDecoration(
-                  hintText: 'Gyakorlat neve (pl. Fekvenyomás)',
-                  hintStyle: const TextStyle(color: Color(0xFF55687D)),
-                  filled: true,
-                  fillColor: const Color(0xFF0D1825),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Color(0xFF26364A)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Color(0xFF28D5CF)),
-                  ),
-                ),
+              const SizedBox(height: 6),
+              Text(
+                'Előző használt súly: ${lastW > 0 ? "$lastW kg" : "Még nincs rögzítve"}',
+                style: const TextStyle(color: Color(0xFF28D5CF), fontSize: 12, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 16),
               Row(
                 children: [
                   Expanded(
                     child: TextField(
                       controller: weightCtrl,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                      style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
-                        hintText: 'Súly (kg)',
-                        hintStyle: const TextStyle(color: Color(0xFF55687D)),
-                        suffixText: 'kg',
-                        suffixStyle: const TextStyle(color: Color(0xFF28D5CF)),
+                        labelText: 'Súly (kg)',
+                        labelStyle: const TextStyle(color: Color(0xFF91A2B5)),
                         filled: true,
                         fillColor: const Color(0xFF0D1825),
                         enabledBorder: OutlineInputBorder(
@@ -175,10 +382,10 @@ class _WorkoutTrackerTabState extends State<WorkoutTrackerTab> {
                     child: TextField(
                       controller: repsCtrl,
                       keyboardType: TextInputType.number,
-                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                      style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
-                        hintText: 'Ismétlés',
-                        hintStyle: const TextStyle(color: Color(0xFF55687D)),
+                        labelText: 'Ismétlés',
+                        labelStyle: const TextStyle(color: Color(0xFF91A2B5)),
                         filled: true,
                         fillColor: const Color(0xFF0D1825),
                         enabledBorder: OutlineInputBorder(
@@ -203,33 +410,34 @@ class _WorkoutTrackerTabState extends State<WorkoutTrackerTab> {
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                  onPressed: () {
-                    final name = nameCtrl.text.trim();
-                    final weight = double.tryParse(weightCtrl.text.replaceAll(',', '.')) ?? 0.0;
-                    final reps = int.tryParse(repsCtrl.text) ?? 0;
+                  onPressed: () async {
+                    final w = double.tryParse(weightCtrl.text.replaceAll(',', '.')) ?? 0.0;
+                    final r = int.tryParse(repsCtrl.text) ?? exercise.defaultReps;
 
-                    if (name.isEmpty || weight <= 0) return;
+                    if (w <= 0) return;
 
-                    final newEntry = ExerciseLogEntry(
-                      id: DateTime.now().millisecondsSinceEpoch.toString(),
-                      exerciseName: name,
-                      weightKg: weight,
-                      reps: reps,
-                      date: DateTime.now(),
-                    );
+                    final prefs = await SharedPreferences.getInstance();
+                    final String? raw = prefs.getString('exercise_progress_logs');
+                    List<dynamic> logs = raw != null ? jsonDecode(raw) : [];
+                    logs.add({
+                      'id': DateTime.now().millisecondsSinceEpoch.toString(),
+                      'exerciseName': exercise.name,
+                      'weightKg': w,
+                      'reps': r,
+                      'date': DateTime.now().toIso8601String(),
+                    });
+                    await prefs.setString('exercise_progress_logs', jsonEncode(logs));
 
                     setState(() {
-                      _allEntries.add(newEntry);
-                      _selectedExercise = name;
+                      _lastWeights[exercise.name] = w;
+                      _completedSets[exercise.name] = (_completedSets[exercise.name] ?? 0) + 1;
                     });
 
-                    _saveExerciseLogs();
                     Navigator.of(ctx, rootNavigator: true).pop();
+                    _startRestTimer(90);
                   },
-                  child: const Text(
-                    'MENTÉS & DIAGRAM FRISSÍTÉSE',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                  ),
+                  child: const Text('SZÉRIA MENTÉSE & PIHENŐ (90s)',
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
@@ -241,324 +449,131 @@ class _WorkoutTrackerTabState extends State<WorkoutTrackerTab> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return const Scaffold(
-        backgroundColor: Color(0xFF07101B),
-        body: Center(child: CircularProgressIndicator(color: Color(0xFF28D5CF))),
-      );
-    }
-
-    final filtered = _filteredEntries;
-    final chartEntries = List<ExerciseLogEntry>.from(filtered)
-      ..sort((a, b) => a.date.compareTo(b.date));
-
-    final double maxWeight = filtered.isEmpty
-        ? 0.0
-        : filtered.map((e) => e.weightKg).reduce((a, b) => a > b ? a : b);
-    final double latestWeight = filtered.isEmpty ? 0.0 : filtered.first.weightKg;
-
     return Scaffold(
       backgroundColor: const Color(0xFF07101B),
       appBar: AppBar(
         backgroundColor: const Color(0xFF07101B),
         elevation: 0,
-        title: const Text(
-          'Edzés Fejlődés & Súlyok',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF28D5CF)),
+          onPressed: () => Navigator.pop(context),
         ),
-        actions: [
-          IconButton(
-            icon: Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0D1825),
-                border: Border.all(color: const Color(0xFF26364A)),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(Icons.add, color: Color(0xFF28D5CF), size: 20),
-            ),
-            onPressed: _showAddLogDialog,
-          ),
-          const SizedBox(width: 12),
-        ],
+        title: Text(
+          '${widget.category.title} Edzésterv',
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0D1825),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFF26364A)),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: _availableExercises.contains(_selectedExercise)
-                      ? _selectedExercise
-                      : _availableExercises.first,
-                  isExpanded: true,
-                  dropdownColor: const Color(0xFF0D1825),
-                  style: const TextStyle(
-                      color: Color(0xFF28D5CF),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16),
-                  items: _availableExercises.map((ex) {
-                    return DropdownMenuItem<String>(
-                      value: ex,
-                      child: Text(ex),
-                    );
-                  }).toList(),
-                  onChanged: (val) {
-                    if (val != null) {
-                      setState(() {
-                        _selectedExercise = val;
-                      });
-                    }
-                  },
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildMetricCard(
-                      'Legutóbbi súly', '$latestWeight kg', const Color(0xFF28D5CF)),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _buildMetricCard(
-                      'Egyéni rekord (PR)', '$maxWeight kg', const Color(0xFFFF356D)),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0D1825),
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: const Color(0xFF26364A)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '$_selectedExercise fejlődési görbe',
-                    style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-                  ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    height: 160,
-                    width: double.infinity,
-                    child: chartEntries.isEmpty
-                        ? const Center(
-                            child: Text(
-                              'Ehhez a gyakorlathoz még nincs felvitt adat.',
-                              style: TextStyle(color: Color(0xFF55687D), fontSize: 13),
-                            ),
-                          )
-                        : CustomPaint(
-                            painter: ExerciseProgressPainter(entries: chartEntries),
-                          ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Gyakorlat Előzmények',
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                Text(
-                  '${filtered.length} mérés',
-                  style: const TextStyle(color: Color(0xFF91A2B5), fontSize: 12),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            if (filtered.isEmpty)
+            if (_isRestActive)
               Container(
-                padding: const EdgeInsets.all(20),
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF0D1825),
+                  color: const Color(0xFFFF356D).withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: const Color(0xFF1B2A3D)),
+                  border: Border.all(color: const Color(0xFFFF356D)),
                 ),
-                child: const Center(
-                  child: Text(
-                    'Koppints a jobb felső + gombra az első súly felviteléhez!',
-                    style: TextStyle(color: Color(0xFF55687D), fontSize: 13),
-                  ),
-                ),
-              )
-            else
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: filtered.length,
-                itemBuilder: (context, index) {
-                  final item = filtered[index];
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF0D1825),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: const Color(0xFF26364A)),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
                       children: [
-                        Row(
+                        const Icon(Icons.timer_outlined, color: Color(0xFFFF356D)),
+                        const SizedBox(width: 10),
+                        Text(
+                          'Pihenőidő hátra: $_restSecondsRemaining mp',
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    TextButton(
+                      onPressed: () => _startRestTimer(0),
+                      child: const Text('Kész', style: TextStyle(color: Color(0xFFFF356D), fontWeight: FontWeight.bold)),
+                    )
+                  ],
+                ),
+              ),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: widget.category.exercises.length,
+              itemBuilder: (ctx, i) {
+                final ex = widget.category.exercises[i];
+                final completed = _completedSets[ex.name] ?? 0;
+                final isFinished = completed >= ex.defaultSets;
+                final lastW = _lastWeights[ex.name] ?? 0.0;
+
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: isFinished ? const Color(0xFF102624) : const Color(0xFF0D1825),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: isFinished ? const Color(0xFF28D5CF) : const Color(0xFF26364A),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF1B2A3D),
-                                borderRadius: BorderRadius.circular(10),
+                            Text(
+                              ex.name,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                                decoration: isFinished ? TextDecoration.lineThrough : null,
                               ),
-                              child: const Icon(Icons.fitness_center,
-                                  color: Color(0xFFFF356D), size: 18),
                             ),
-                            const SizedBox(width: 14),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            const SizedBox(height: 4),
+                            Row(
                               children: [
                                 Text(
-                                  '${item.weightKg} kg × ${item.reps} ism.',
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16),
+                                  'Cél: ${ex.defaultSets} × ${ex.defaultReps} ism.',
+                                  style: const TextStyle(color: Color(0xFF91A2B5), fontSize: 12),
                                 ),
+                                const SizedBox(width: 10),
                                 Text(
-                                  DateFormat('yyyy. MM. dd. - HH:mm').format(item.date),
-                                  style: const TextStyle(
-                                      color: Color(0xFF91A2B5), fontSize: 12),
+                                  'Előző: ${lastW > 0 ? "$lastW kg" : "---"}',
+                                  style: const TextStyle(color: Color(0xFFFFB800), fontWeight: FontWeight.bold, fontSize: 12),
                                 ),
                               ],
                             ),
                           ],
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.delete_outline,
-                              color: Color(0xFFFF356D), size: 20),
-                          onPressed: () {
-                            setState(() {
-                              _allEntries.removeWhere((e) => e.id == item.id);
-                            });
-                            _saveExerciseLogs();
-                          },
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isFinished ? const Color(0xFF28D5CF) : const Color(0xFFFF356D),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+                        onPressed: () => _logSetDialog(ex),
+                        child: Text(
+                          isFinished ? 'KÉSZ ($completed/${ex.defaultSets})' : 'SZÉRIA ($completed/${ex.defaultSets})',
+                          style: TextStyle(
+                            color: isFinished ? const Color(0xFF07101B) : Colors.white,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           ],
         ),
       ),
     );
   }
-
-  Widget _buildMetricCard(String title, String val, Color accent) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0D1825),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFF26364A)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: const TextStyle(color: Color(0xFF91A2B5), fontSize: 11)),
-          const SizedBox(height: 4),
-          Text(val,
-              style: TextStyle(
-                  color: accent, fontWeight: FontWeight.w900, fontSize: 18)),
-        ],
-      ),
-    );
-  }
 }
-
-class ExerciseProgressPainter extends CustomPainter {
-  final List<ExerciseLogEntry> entries;
-
-  ExerciseProgressPainter({required this.entries});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (entries.isEmpty) return;
-
-    final linePaint = Paint()
-      ..color = const Color(0xFFFF356D)
-      ..strokeWidth = 3
-      ..style = PaintingStyle.stroke;
-
-    final dotPaint = Paint()
-      ..color = const Color(0xFF28D5CF)
-      ..style = PaintingStyle.fill;
-
-    final gridPaint = Paint()
-      ..color = const Color(0xFF26364A).withValues(alpha: 0.5)
-      ..strokeWidth = 1;
-
-    for (int i = 0; i <= 3; i++) {
-      final y = size.height * (i / 3);
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
-    }
-
-    if (entries.length == 1) {
-      canvas.drawCircle(Offset(size.width / 2, size.height / 2), 6, dotPaint);
-      return;
-    }
-
-    double minW = entries.map((e) => e.weightKg).reduce((a, b) => a < b ? a : b);
-    double maxW = entries.map((e) => e.weightKg).reduce((a, b) => a > b ? a : b);
-
-    if (minW == maxW) {
-      minW -= 2;
-      maxW += 2;
-    } else {
-      final pad = (maxW - minW) * 0.15;
-      minW -= pad;
-      maxW += pad;
-    }
-
-    final path = Path();
-    final points = <Offset>[];
-
-    for (int i = 0; i < entries.length; i++) {
-      final x = (size.width / (entries.length - 1)) * i;
-      final y = size.height - ((entries[i].weightKg - minW) / (maxW - minW) * size.height);
-      final pt = Offset(x, y);
-      points.add(pt);
-
-      if (i == 0) {
-        path.moveTo(x, y);
-      } else {
-        path.lineTo(x, y);
-      }
-    }
-
-    canvas.drawPath(path, linePaint);
-
-    for (final pt in points) {
-      canvas.drawCircle(pt, 4.5, dotPaint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant ExerciseProgressPainter oldDelegate) => true;
-}
+'@ | Set-Content -Path "lib/screens/workout_tracker_tab.dart" -Encoding UTF8
