@@ -1,68 +1,73 @@
-﻿name: Mobile Release Build (Android & iOS Only)
+﻿name: Mobile Release Build
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch:
 
 jobs:
   build-android:
+    name: Build Android APK
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: temurin
+          java-version: "17"
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          channel: stable
           cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
       - name: Build Android APK
-        run: |
-          flutter pub get
-          flutter build apk --release
+        run: flutter build apk --release
+
       - name: Upload Android APK
         uses: actions/upload-artifact@v4
         with:
           name: Android-APK
           path: build/app/outputs/flutter-apk/app-release.apk
 
+
   build-ios:
+    name: Build iOS Unsigned IPA
     runs-on: macos-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          channel: stable
           cache: true
-      - name: Build Device-Ready Unsigned iOS IPA
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build iOS without code signing
         run: |
-          flutter pub get
           flutter build ios --release --no-codesign
-          cd ios
-          xcodebuild clean build \
-            -workspace Runner.xcworkspace \
-            -scheme Runner \
-            -configuration Release \
-            -sdk iphoneos \
-            -destination 'generic/platform=iOS' \
-            -derivedDataPath ../build/ios/DerivedData \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            PROVISIONING_PROFILE="" \
-            ONLY_ACTIVE_ARCH=NO
-          cd ..
-          mkdir -p build/ios/iphoneos/Payload
-          cp -r build/ios/DerivedData/Build/Products/Release-iphoneos/Runner.app build/ios/iphoneos/Payload/
-          cd build/ios/iphoneos
-          zip -r App.ipa Payload
-      - name: Upload iOS IPA
+
+      - name: Create unsigned IPA
+        run: |
+          mkdir -p Payload
+          cp -R build/ios/iphoneos/Runner.app Payload/Runner.app
+          zip -r DagiApp-iOS-Unsigned.ipa Payload
+
+      - name: Upload unsigned IPA
         uses: actions/upload-artifact@v4
         with:
-          name: iOS-IPA-Sideloadable
-          path: build/ios/iphoneos/App.ipa
+          name: iOS-Unsigned-IPA
+          path: DagiApp-iOS-Unsigned.ipa
