@@ -219,6 +219,84 @@ class _DashboardTabState extends State<DashboardTab> {
     }
   }
 
+  void _sendWorkoutInviteDialog() {
+    if (_todayExercises.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: const Text('Nincs aktív edzésed a mai napra! Állíts össze egyet az Edzés fülön.'), backgroundColor: _theme.secondaryColor),
+      );
+      return;
+    }
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: _theme.backgroundColor,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Közös Edzés Meghívó Küldése 👥', style: TextStyle(color: _theme.primaryColor, fontWeight: FontWeight.bold, fontSize: 18)),
+            const SizedBox(height: 6),
+            Text('Mai edzés: $_workoutDayType (${_todayExercises.length} gyakorlat)', style: const TextStyle(color: Colors.white, fontSize: 13)),
+            const SizedBox(height: 14),
+            const Text('Válassz barátot, akit meghívsz edzőpartnernek:', style: TextStyle(color: Color(0xFF91A2B5), fontSize: 12)),
+            const SizedBox(height: 10),
+            ListTile(
+              leading: CircleAvatar(backgroundColor: _theme.primaryColor, child: const Text('B', style: TextStyle(color: Color(0xFF07101B)))),
+              title: const Text('Balázs (#BALAZS_9912)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              trailing: Icon(Icons.send_rounded, color: _theme.primaryColor),
+              onTap: () async {
+                Navigator.pop(ctx);
+                final prefs = await SharedPreferences.getInstance();
+                final raw = prefs.getString('shared_workout_invites_queue');
+                List<dynamic> list = raw != null ? jsonDecode(raw) : [];
+                list.add({
+                  'id': DateTime.now().millisecondsSinceEpoch.toString(),
+                  'fromUser': 'Peti',
+                  'workoutTitle': _workoutDayType,
+                  'exercises': _todayExercises.map((e) => {'name': e.name, 'targetSets': e.targetSets, 'targetReps': e.targetReps}).toList(),
+                  'date': DateTime.now().toIso8601String(),
+                });
+                await prefs.setString('shared_workout_invites_queue', jsonEncode(list));
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Közös edzés meghívó sikeresen elküldve Balázsnak! 🔥'), backgroundColor: _theme.primaryColor),
+                  );
+                }
+              },
+            ),
+            ListTile(
+              leading: CircleAvatar(backgroundColor: _theme.secondaryColor, child: const Text('G', style: TextStyle(color: Colors.white))),
+              title: const Text('Gergő (#GERGO_4411)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              trailing: Icon(Icons.send_rounded, color: _theme.primaryColor),
+              onTap: () async {
+                Navigator.pop(ctx);
+                final prefs = await SharedPreferences.getInstance();
+                final raw = prefs.getString('shared_workout_invites_queue');
+                List<dynamic> list = raw != null ? jsonDecode(raw) : [];
+                list.add({
+                  'id': DateTime.now().millisecondsSinceEpoch.toString(),
+                  'fromUser': 'Peti',
+                  'workoutTitle': _workoutDayType,
+                  'exercises': _todayExercises.map((e) => {'name': e.name, 'targetSets': e.targetSets, 'targetReps': e.targetReps}).toList(),
+                  'date': DateTime.now().toIso8601String(),
+                });
+                await prefs.setString('shared_workout_invites_queue', jsonEncode(list));
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Közös edzés meghívó sikeresen elküldve Gergőnek! 🔥'), backgroundColor: _theme.primaryColor),
+                  );
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showEditCalorieTargetDialog() {
     final ctrl = TextEditingController(text: _targetCalories.toString());
     showDialog(
@@ -284,7 +362,6 @@ class _DashboardTabState extends State<DashboardTab> {
   double get _consumedCarbs => _meals.fold(0.0, (sum, item) => sum + item.carbs);
   double get _consumedFat => _meals.fold(0.0, (sum, item) => sum + item.fat);
 
-  // Összes és elvégzett szériák száma a haladáshoz
   int get _totalPlannedSets => _todayExercises.fold(0, (sum, e) => sum + e.targetSets);
   int get _totalDoneSets => _todayExercises.fold(0, (sum, e) => sum + e.completedSets);
 
@@ -706,7 +783,7 @@ class _DashboardTabState extends State<DashboardTab> {
                     ),
                   ),
 
-                // MAI EDZÉS FEJLÉC & VALÓS HALADÁS CSÍK
+                // MAI EDZÉS FEJLÉC, HALADÁS ÉS KÖZÖS EDZÉS MEGHÍVÓ GOMB
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -733,8 +810,26 @@ class _DashboardTabState extends State<DashboardTab> {
                               ),
                             ],
                           ),
-                          if (_totalPlannedSets > 0)
-                            Text('$_totalDoneSets / $_totalPlannedSets széria', style: TextStyle(color: _theme.primaryColor, fontWeight: FontWeight.bold, fontSize: 12)),
+                          Row(
+                            children: [
+                              if (_todayExercises.isNotEmpty)
+                                IconButton(
+                                  icon: Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: _theme.primaryColor.withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(color: _theme.primaryColor),
+                                    ),
+                                    child: Icon(Icons.group_add_rounded, color: _theme.primaryColor, size: 18),
+                                  ),
+                                  tooltip: 'Barát meghívása erre az edzésre',
+                                  onPressed: _sendWorkoutInviteDialog,
+                                ),
+                              if (_totalPlannedSets > 0)
+                                Text('$_totalDoneSets / $_totalPlannedSets széria', style: TextStyle(color: _theme.primaryColor, fontWeight: FontWeight.bold, fontSize: 12)),
+                            ],
+                          ),
                         ],
                       ),
                       if (_totalPlannedSets > 0) ...[
