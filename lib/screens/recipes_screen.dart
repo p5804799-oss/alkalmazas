@@ -16,20 +16,17 @@ class _RecipesScreenState extends State<RecipesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final filteredList = kLidlExcelRecipes.where((rec) {
+      if (_selectedCategory == 'Összes') return true;
+      return rec.category.contains(_selectedCategory);
+    }).toList();
+
     return AnimatedBuilder(
       animation: _theme,
       builder: (context, _) {
-        final filteredList = kLidlExcelRecipes.where((rec) {
-          if (_selectedCategory == 'Összes') return true;
-          return rec.category.contains(_selectedCategory);
-        }).toList();
-
         return Scaffold(
           backgroundColor: _theme.backgroundColor,
-          appBar: AppBar(
-            backgroundColor: _theme.backgroundColor,
-            title: const Text('Lidl & Excel Recepttár', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
-          ),
+          appBar: AppBar(backgroundColor: _theme.backgroundColor, title: const Text('Lidl & Excel Recepttár', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900))),
           body: Column(
             children: [
               SingleChildScrollView(
@@ -45,9 +42,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
                         selected: isSel,
                         selectedColor: _theme.primaryColor,
                         backgroundColor: _theme.cardColor,
-                        onSelected: (val) {
-                          if (val) setState(() => _selectedCategory = cat);
-                        },
+                        onSelected: (val) { if (val) setState(() => _selectedCategory = cat); },
                       ),
                     );
                   }).toList(),
@@ -62,11 +57,7 @@ class _RecipesScreenState extends State<RecipesScreen> {
                     return Container(
                       margin: const EdgeInsets.only(bottom: 12),
                       padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: _theme.cardColor,
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(color: const Color(0xFF1F2F42)),
-                      ),
+                      decoration: BoxDecoration(color: _theme.cardColor, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0xFF1F2F42))),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [

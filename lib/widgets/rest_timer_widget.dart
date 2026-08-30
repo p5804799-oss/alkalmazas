@@ -17,11 +17,7 @@ class _RestTimerWidgetState extends State<RestTimerWidget> {
 
   void _startTimer(int seconds) {
     _timer?.cancel();
-    setState(() {
-      _secondsRemaining = seconds;
-      _isRunning = true;
-    });
-
+    setState(() { _secondsRemaining = seconds; _isRunning = true; });
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_secondsRemaining > 0) {
         setState(() => _secondsRemaining--);
@@ -34,10 +30,7 @@ class _RestTimerWidgetState extends State<RestTimerWidget> {
 
   void _stopTimer() {
     _timer?.cancel();
-    setState(() {
-      _isRunning = false;
-      _secondsRemaining = 0;
-    });
+    setState(() { _isRunning = false; _secondsRemaining = 0; });
   }
 
   @override
@@ -78,8 +71,7 @@ class _RestTimerWidgetState extends State<RestTimerWidget> {
               _timerButton('60s', () => _startTimer(60)),
               _timerButton('90s', () => _startTimer(90)),
               _timerButton('120s', () => _startTimer(120)),
-              if (_isRunning)
-                IconButton(icon: const Icon(Icons.stop_rounded, color: Colors.redAccent), onPressed: _stopTimer),
+              if (_isRunning) IconButton(icon: const Icon(Icons.stop_rounded, color: Colors.redAccent), onPressed: _stopTimer),
             ],
           ),
         ],

@@ -13,7 +13,7 @@ class _ProgressTabState extends State<ProgressTab> {
   final ThemeService _theme = ThemeService();
   double _currentWeight = 78.5;
   double _targetWeight = 75.0;
-  List<double> _weightHistory = [81.0, 80.2, 79.4, 78.5];
+  final List<double> _weightHistory = [81.0, 80.2, 79.4, 78.5];
 
   @override
   void initState() {
@@ -36,10 +36,7 @@ class _ProgressTabState extends State<ProgressTab> {
       builder: (context, _) {
         return Scaffold(
           backgroundColor: _theme.backgroundColor,
-          appBar: AppBar(
-            backgroundColor: _theme.backgroundColor,
-            title: const Text('Dagi app • Fejlődés & Grafikok', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
-          ),
+          appBar: AppBar(backgroundColor: _theme.backgroundColor, title: const Text('Dagi app • Fejlődés & Grafikonok', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900))),
           body: ListView(
             padding: const EdgeInsets.all(16),
             children: [
@@ -76,7 +73,7 @@ class _ProgressTabState extends State<ProgressTab> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('HETI SÚLYVÁLTOZÁS TREND (GRAFIKON)', style: TextStyle(color: Color(0xFF91A2B5), fontWeight: FontWeight.w900, fontSize: 12)),
+                    const Text('HETI SÚLYVÁLTOZÁS TREND', style: TextStyle(color: Color(0xFF91A2B5), fontWeight: FontWeight.w900, fontSize: 12)),
                     const SizedBox(height: 20),
                     SizedBox(
                       height: 120,
@@ -90,14 +87,7 @@ class _ProgressTabState extends State<ProgressTab> {
                             children: [
                               Text('$w kg', style: const TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.bold)),
                               const SizedBox(height: 6),
-                              Container(
-                                width: 32,
-                                height: heightFactor * 80,
-                                decoration: BoxDecoration(
-                                  color: _theme.primaryColor,
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                              ),
+                              Container(width: 32, height: heightFactor * 80, decoration: BoxDecoration(color: _theme.primaryColor, borderRadius: BorderRadius.circular(6))),
                               const SizedBox(height: 6),
                               const Text('Mérés', style: TextStyle(color: Color(0xFF91A2B5), fontSize: 10)),
                             ],

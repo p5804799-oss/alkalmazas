@@ -1,9 +1,10 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'recipes_screen.dart';
 import '../services/theme_service.dart';
 import '../models/recipe_model.dart';
-import 'dart:convert';
+import '../widgets/rest_timer_widget.dart';
 
 class DashboardTab extends StatefulWidget {
   const DashboardTab({super.key});
@@ -19,6 +20,7 @@ class _DashboardTabState extends State<DashboardTab> {
     'summary',
     'macro_chart',
     'food_log',
+    'rest_timer',
     'workout',
     'water',
     'recipes',
@@ -41,9 +43,7 @@ class _DashboardTabState extends State<DashboardTab> {
   Future<void> _loadDashboardData() async {
     final prefs = await SharedPreferences.getInstance();
     final savedOrder = prefs.getStringList('dashboard_card_order');
-    if (savedOrder != null && savedOrder.isNotEmpty) {
-      _cardOrder = savedOrder;
-    }
+    if (savedOrder != null && savedOrder.isNotEmpty) _cardOrder = savedOrder;
 
     _todayWorkoutType = prefs.getString('daily_workout_type') ?? 'Nincs mára tervezett edzés';
     final rawExercises = prefs.getString('daily_planned_exercises');
@@ -63,21 +63,10 @@ class _DashboardTabState extends State<DashboardTab> {
     setState(() {});
   }
 
-  int get _totalConsumedCalories {
-    return _loggedMeals.fold(0, (sum, item) => sum + (item['calories'] as int? ?? 0));
-  }
-
-  int get _totalConsumedProtein {
-    return _loggedMeals.fold(0, (sum, item) => sum + (item['protein'] as int? ?? 0));
-  }
-
-  int get _totalConsumedCarbs {
-    return _loggedMeals.fold(0, (sum, item) => sum + (item['carbs'] as int? ?? 0));
-  }
-
-  int get _totalConsumedFat {
-    return _loggedMeals.fold(0, (sum, item) => sum + (item['fat'] as int? ?? 0));
-  }
+  int get _totalConsumedCalories => _loggedMeals.fold(0, (sum, item) => sum + (item['calories'] as int? ?? 0));
+  int get _totalConsumedProtein => _loggedMeals.fold(0, (sum, item) => sum + (item['protein'] as int? ?? 0));
+  int get _totalConsumedCarbs => _loggedMeals.fold(0, (sum, item) => sum + (item['carbs'] as int? ?? 0));
+  int get _totalConsumedFat => _loggedMeals.fold(0, (sum, item) => sum + (item['fat'] as int? ?? 0));
 
   Future<void> _updateWater(int delta) async {
     final prefs = await SharedPreferences.getInstance();
@@ -97,7 +86,7 @@ class _DashboardTabState extends State<DashboardTab> {
 
   void _showAddMealDialog() {
     String selectedMealType = 'Reggeli';
-    RecipeItem? selectedRecipe = kLidlExcelRecipes.first;
+    RecipeItem selectedRecipe = kLidlExcelRecipes.first;
 
     showModalBottomSheet(
       context: context,
@@ -107,12 +96,7 @@ class _DashboardTabState extends State<DashboardTab> {
       builder: (ctx) => StatefulBuilder(
         builder: (context, setSheetState) {
           return Padding(
-            padding: EdgeInsets.only(
-              left: 20,
-              right: 20,
-              top: 24,
-              bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-            ),
+            padding: EdgeInsets.only(left: 20, right: 20, top: 24, bottom: MediaQuery.of(context).viewInsets.bottom + 24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -136,9 +120,7 @@ class _DashboardTabState extends State<DashboardTab> {
                       selected: isSel,
                       selectedColor: _theme.primaryColor,
                       backgroundColor: _theme.cardColor,
-                      onSelected: (val) {
-                        if (val) setSheetState(() => selectedMealType = type);
-                      },
+                      onSelected: (val) { if (val) setSheetState(() => selectedMealType = type); },
                     );
                   }).toList(),
                 ),
@@ -147,11 +129,7 @@ class _DashboardTabState extends State<DashboardTab> {
                 const SizedBox(height: 6),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
-                  decoration: BoxDecoration(
-                    color: _theme.cardColor,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFF26364A)),
-                  ),
+                  decoration: BoxDecoration(color: _theme.cardColor, borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF26364A))),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<RecipeItem>(
                       value: selectedRecipe,
@@ -163,9 +141,7 @@ class _DashboardTabState extends State<DashboardTab> {
                           child: Text('${rec.name} (${rec.calories} kcal)', style: const TextStyle(color: Colors.white, fontSize: 13)),
                         );
                       }).toList(),
-                      onChanged: (val) {
-                        if (val != null) setSheetState(() => selectedRecipe = val);
-                      },
+                      onChanged: (val) { if (val != null) setSheetState(() => selectedRecipe = val); },
                     ),
                   ),
                 ),
@@ -175,24 +151,20 @@ class _DashboardTabState extends State<DashboardTab> {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(backgroundColor: _theme.primaryColor, padding: const EdgeInsets.symmetric(vertical: 14)),
                     onPressed: () async {
-                      if (selectedRecipe != null) {
-                        final newMeal = {
-                          'type': selectedMealType,
-                          'name': selectedRecipe!.name,
-                          'calories': selectedRecipe!.calories,
-                          'protein': selectedRecipe!.protein,
-                          'carbs': selectedRecipe!.carbs,
-                          'fat': selectedRecipe!.fat,
-                        };
-                        setState(() {
-                          _loggedMeals.add(newMeal);
-                        });
-                        final prefs = await SharedPreferences.getInstance();
-                        await prefs.setString('daily_logged_meals', jsonEncode(_loggedMeals));
+                      final newMeal = {
+                        'type': selectedMealType,
+                        'name': selectedRecipe.name,
+                        'calories': selectedRecipe.calories,
+                        'protein': selectedRecipe.protein,
+                        'carbs': selectedRecipe.carbs,
+                        'fat': selectedRecipe.fat,
+                      };
+                      setState(() => _loggedMeals.add(newMeal));
+                      final prefs = await SharedPreferences.getInstance();
+                      await prefs.setString('daily_logged_meals', jsonEncode(_loggedMeals));
+                      if (mounted) {
                         Navigator.pop(ctx);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('${selectedRecipe!.name} rögzítve! 🚀'), backgroundColor: _theme.primaryColor),
-                        );
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${selectedRecipe.name} rögzítve! 🚀'), backgroundColor: _theme.primaryColor));
                       }
                     },
                     child: const Text('HOZZÁADÁS A NAPLÓHOZ ➕', style: TextStyle(color: Color(0xFF07101B), fontWeight: FontWeight.w900)),
@@ -220,18 +192,13 @@ class _DashboardTabState extends State<DashboardTab> {
               text: TextSpan(
                 text: 'Dagi',
                 style: TextStyle(color: _theme.primaryColor, fontSize: 22, fontWeight: FontWeight.w900),
-                children: [
-                  TextSpan(text: ' app', style: TextStyle(color: _theme.secondaryColor)),
-                ],
+                children: [TextSpan(text: ' app', style: TextStyle(color: _theme.secondaryColor))],
               ),
             ),
           ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: _cardOrder.map((key) => _buildCardByKey(key)).toList(),
-            ),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: _cardOrder.map((key) => _buildCardByKey(key)).toList()),
           ),
         );
       },
@@ -243,6 +210,7 @@ class _DashboardTabState extends State<DashboardTab> {
       case 'summary': return _buildSummaryCard();
       case 'macro_chart': return _buildMacroChartCard();
       case 'food_log': return _buildFoodLogCard();
+      case 'rest_timer': return const RestTimerWidget();
       case 'workout': return _buildWorkoutCard();
       case 'water': return _buildWaterCard();
       case 'recipes': return _buildRecipesCard();
@@ -254,7 +222,6 @@ class _DashboardTabState extends State<DashboardTab> {
   Widget _buildSummaryCard() {
     const targetCalories = 2450;
     final calProgress = (_totalConsumedCalories / targetCalories).clamp(0.0, 1.0);
-
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -270,13 +237,7 @@ class _DashboardTabState extends State<DashboardTab> {
             ],
           ),
           const SizedBox(height: 10),
-          LinearProgressIndicator(
-            value: calProgress,
-            backgroundColor: const Color(0xFF1F2F42),
-            color: _theme.primaryColor,
-            minHeight: 6,
-            borderRadius: BorderRadius.circular(3),
-          ),
+          LinearProgressIndicator(value: calProgress, backgroundColor: const Color(0xFF1F2F42), color: _theme.primaryColor, minHeight: 6, borderRadius: BorderRadius.circular(3)),
           const SizedBox(height: 14),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -299,10 +260,7 @@ class _DashboardTabState extends State<DashboardTab> {
         const SizedBox(height: 2),
         Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
         const SizedBox(height: 4),
-        SizedBox(
-          width: 85,
-          child: LinearProgressIndicator(value: progress, backgroundColor: const Color(0xFF1F2F42), color: color, minHeight: 4),
-        ),
+        SizedBox(width: 85, child: LinearProgressIndicator(value: progress, backgroundColor: const Color(0xFF1F2F42), color: color, minHeight: 4)),
       ],
     );
   }
@@ -315,46 +273,42 @@ class _DashboardTabState extends State<DashboardTab> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(color: _theme.cardColor, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0xFF1F2F42))),
-      child: Theme(
-        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-        child: ExpansionTile(
-          initiallyExpanded: false,
-          leading: Icon(Icons.pie_chart_rounded, color: _theme.secondaryColor),
-          title: const Text('Valós Makró Eloszlás & Kalória', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-          subtitle: Text('Bevitt: $_totalConsumedCalories kcal', style: const TextStyle(color: Color(0xFF91A2B5), fontSize: 12)),
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _legendDot('Fehérje (${_totalConsumedProtein}g)', _theme.primaryColor),
-                      _legendDot('Szénhidrát (${_totalConsumedCarbs}g)', _theme.secondaryColor),
-                      _legendDot('Zsír (${_totalConsumedFat}g)', const Color(0xFFFFB300)),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Container(
-                    height: 14,
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(7)),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(7),
-                      child: Row(
-                        children: [
-                          Expanded(flex: totalP, child: Container(color: _theme.primaryColor)),
-                          Expanded(flex: totalC, child: Container(color: _theme.secondaryColor)),
-                          Expanded(flex: totalF, child: Container(color: const Color(0xFFFFB300))),
-                        ],
-                      ),
+      child: ExpansionTile(
+        initiallyExpanded: false,
+        leading: Icon(Icons.pie_chart_rounded, color: _theme.secondaryColor),
+        title: const Text('Valós Makró Eloszlás & Kalória', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+        subtitle: Text('Bevitt: $_totalConsumedCalories kcal', style: const TextStyle(color: Color(0xFF91A2B5), fontSize: 12)),
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _legendDot('Fehérje (${_totalConsumedProtein}g)', _theme.primaryColor),
+                    _legendDot('Szénhidrát (${_totalConsumedCarbs}g)', _theme.secondaryColor),
+                    _legendDot('Zsír (${_totalConsumedFat}g)', const Color(0xFFFFB300)),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  height: 14,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(7),
+                    child: Row(
+                      children: [
+                        Expanded(flex: totalP, child: Container(color: _theme.primaryColor)),
+                        Expanded(flex: totalC, child: Container(color: _theme.secondaryColor)),
+                        Expanded(flex: totalF, child: Container(color: const Color(0xFFFFB300))),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -435,47 +389,44 @@ class _DashboardTabState extends State<DashboardTab> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(color: _theme.cardColor, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0xFF1F2F42))),
-      child: Theme(
-        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-        child: ExpansionTile(
-          initiallyExpanded: false,
-          leading: Icon(Icons.fitness_center_rounded, color: _theme.primaryColor),
-          title: Text(_todayWorkoutType, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-          subtitle: Text('${_plannedExercises.length} gyakorlat', style: const TextStyle(color: Color(0xFF91A2B5), fontSize: 12)),
-          children: [
-            if (_plannedExercises.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: _plannedExercises.asMap().entries.map((entry) {
-                    final idx = entry.key;
-                    final ex = entry.value;
-                    final completed = ex['completedSets'] ?? 0;
-                    final target = ex['targetSets'] ?? 3;
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(color: _theme.backgroundColor, borderRadius: BorderRadius.circular(10)),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(child: Text(ex['name'] ?? '', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13))),
-                          InkWell(
-                            onTap: () => _toggleExerciseSet(idx),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                              decoration: BoxDecoration(color: completed >= target ? _theme.primaryColor : const Color(0xFF1F2F42), borderRadius: BorderRadius.circular(8)),
-                              child: Text('$completed / $target', style: TextStyle(color: completed >= target ? const Color(0xFF07101B) : Colors.white, fontWeight: FontWeight.w900)),
-                            ),
+      child: ExpansionTile(
+        initiallyExpanded: false,
+        leading: Icon(Icons.fitness_center_rounded, color: _theme.primaryColor),
+        title: Text(_todayWorkoutType, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+        subtitle: Text('${_plannedExercises.length} gyakorlat', style: const TextStyle(color: Color(0xFF91A2B5), fontSize: 12)),
+        children: [
+          if (_plannedExercises.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: _plannedExercises.asMap().entries.map((entry) {
+                  final idx = entry.key;
+                  final ex = entry.value;
+                  final completed = ex['completedSets'] ?? 0;
+                  final target = ex['targetSets'] ?? 3;
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(color: _theme.backgroundColor, borderRadius: BorderRadius.circular(10)),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(child: Text(ex['name'] ?? '', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13))),
+                        InkWell(
+                          onTap: () => _toggleExerciseSet(idx),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            decoration: BoxDecoration(color: completed >= target ? _theme.primaryColor : const Color(0xFF1F2F42), borderRadius: BorderRadius.circular(8)),
+                            child: Text('$completed / $target', style: TextStyle(color: completed >= target ? const Color(0xFF07101B) : Colors.white, fontWeight: FontWeight.w900)),
                           ),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
               ),
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }

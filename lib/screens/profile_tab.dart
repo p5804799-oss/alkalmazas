@@ -43,9 +43,7 @@ class _ProfileTabState extends State<ProfileTab> {
     await prefs.setString('user_handle', _userHandle);
 
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: const Text('Profil és online fiók adatok mentve! ☁️💪'), backgroundColor: _theme.primaryColor),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text('Profil és online fiók adatok mentve! ☁️💪'), backgroundColor: _theme.primaryColor));
     }
   }
 
@@ -56,10 +54,7 @@ class _ProfileTabState extends State<ProfileTab> {
       builder: (context, _) {
         return Scaffold(
           backgroundColor: _theme.backgroundColor,
-          appBar: AppBar(
-            backgroundColor: _theme.backgroundColor,
-            title: const Text('Dagi app • Profil & Online Fiók', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
-          ),
+          appBar: AppBar(backgroundColor: _theme.backgroundColor, title: const Text('Dagi app • Profil & Online Fiók', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900))),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -67,18 +62,10 @@ class _ProfileTabState extends State<ProfileTab> {
               children: [
                 Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: _theme.cardColor,
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: _theme.primaryColor.withValues(alpha: 0.5), width: 1.5),
-                  ),
+                  decoration: BoxDecoration(color: _theme.cardColor, borderRadius: BorderRadius.circular(18), border: Border.all(color: _theme.primaryColor.withValues(alpha: 0.5), width: 1.5)),
                   child: Row(
                     children: [
-                      CircleAvatar(
-                        radius: 28,
-                        backgroundColor: _theme.primaryColor.withValues(alpha: 0.2),
-                        child: Icon(Icons.cloud_sync_rounded, color: _theme.primaryColor, size: 30),
-                      ),
+                      CircleAvatar(radius: 28, backgroundColor: _theme.primaryColor.withValues(alpha: 0.2), child: Icon(Icons.cloud_sync_rounded, color: _theme.primaryColor, size: 30)),
                       const SizedBox(width: 16),
                       Expanded(
                         child: Column(
@@ -121,37 +108,13 @@ class _ProfileTabState extends State<ProfileTab> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Napi Lépésszám Cél: $_stepGoal lépés', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                      Slider(
-                        value: _stepGoal.toDouble(),
-                        min: 3000,
-                        max: 25000,
-                        divisions: 44,
-                        activeColor: _theme.primaryColor,
-                        inactiveColor: const Color(0xFF26364A),
-                        onChanged: (val) => setState(() => _stepGoal = val.toInt()),
-                      ),
+                      Slider(value: _stepGoal.toDouble(), min: 3000, max: 25000, divisions: 44, activeColor: _theme.primaryColor, inactiveColor: const Color(0xFF26364A), onChanged: (val) => setState(() => _stepGoal = val.toInt())),
                       const SizedBox(height: 10),
                       Text('Aktuális Súly: $_currentWeight kg', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                      Slider(
-                        value: _currentWeight,
-                        min: 40.0,
-                        max: 160.0,
-                        divisions: 240,
-                        activeColor: _theme.secondaryColor,
-                        inactiveColor: const Color(0xFF26364A),
-                        onChanged: (val) => setState(() => _currentWeight = double.parse(val.toStringAsFixed(1))),
-                      ),
+                      Slider(value: _currentWeight, min: 40.0, max: 160.0, divisions: 240, activeColor: _theme.secondaryColor, inactiveColor: const Color(0xFF26364A), onChanged: (val) => setState(() => _currentWeight = double.parse(val.toStringAsFixed(1)))),
                       const SizedBox(height: 10),
                       Text('Cél Súly: $_targetWeight kg', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                      Slider(
-                        value: _targetWeight,
-                        min: 40.0,
-                        max: 160.0,
-                        divisions: 240,
-                        activeColor: _theme.primaryColor,
-                        inactiveColor: const Color(0xFF26364A),
-                        onChanged: (val) => setState(() => _targetWeight = double.parse(val.toStringAsFixed(1))),
-                      ),
+                      Slider(value: _targetWeight, min: 40.0, max: 160.0, divisions: 240, activeColor: _theme.primaryColor, inactiveColor: const Color(0xFF26364A), onChanged: (val) => setState(() => _targetWeight = double.parse(val.toStringAsFixed(1)))),
                     ],
                   ),
                 ),

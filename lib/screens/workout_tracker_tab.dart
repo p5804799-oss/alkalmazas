@@ -10,23 +10,9 @@ class RoutineExercise {
   int defaultSets;
   int defaultReps;
 
-  RoutineExercise({
-    required this.name,
-    required this.defaultSets,
-    required this.defaultReps,
-  });
+  RoutineExercise({required this.name, required this.defaultSets, required this.defaultReps});
 
-  Map<String, dynamic> toMap() => {
-        'name': name,
-        'defaultSets': defaultSets,
-        'defaultReps': defaultReps,
-      };
-
-  factory RoutineExercise.fromMap(Map<String, dynamic> map) => RoutineExercise(
-        name: map['name'] ?? '',
-        defaultSets: map['defaultSets'] ?? 3,
-        defaultReps: map['defaultReps'] ?? 10,
-      );
+  Map<String, dynamic> toMap() => {'name': name, 'defaultSets': defaultSets, 'defaultReps': defaultReps};
 }
 
 class WorkoutCategory {
@@ -37,14 +23,7 @@ class WorkoutCategory {
   final String imageUrl;
   final List<RoutineExercise> exercises;
 
-  WorkoutCategory({
-    required this.id,
-    required this.title,
-    required this.subtitle,
-    required this.iconBadge,
-    required this.imageUrl,
-    required this.exercises,
-  });
+  WorkoutCategory({required this.id, required this.title, required this.subtitle, required this.iconBadge, required this.imageUrl, required this.exercises});
 }
 
 List<WorkoutCategory> getInitialWorkoutCategories() => [
@@ -57,15 +36,15 @@ List<WorkoutCategory> getInitialWorkoutCategories() => [
     exercises: [
       RoutineExercise(name: 'Fekvenyomás rúddal (vízszintes pad)', defaultSets: 4, defaultReps: 8),
       RoutineExercise(name: 'Fekvenyomás kézisúlyzóval', defaultSets: 4, defaultReps: 10),
-      RoutineExercise(name: 'Döntött padú nyomás rúddal (felső mell)', defaultSets: 4, defaultReps: 8),
+      RoutineExercise(name: 'Döntött padú nyomás rúddal', defaultSets: 4, defaultReps: 8),
       RoutineExercise(name: 'Döntött padú nyomás kézisúlyzóval', defaultSets: 4, defaultReps: 10),
       RoutineExercise(name: 'Negatív dőlésű fekvenyomás', defaultSets: 3, defaultReps: 10),
-      RoutineExercise(name: 'Tolódzkodás párhuzamos korláton (mellső súlypont)', defaultSets: 3, defaultReps: 10),
+      RoutineExercise(name: 'Tolódzkodás párhuzamos korláton', defaultSets: 3, defaultReps: 10),
       RoutineExercise(name: 'Tárogatás kézisúlyzóval', defaultSets: 3, defaultReps: 12),
       RoutineExercise(name: 'Tárogatás csigán keresztben', defaultSets: 4, defaultReps: 12),
       RoutineExercise(name: 'Mellprés gép ülve', defaultSets: 3, defaultReps: 10),
       RoutineExercise(name: 'Pec Deck gép', defaultSets: 3, defaultReps: 12),
-      RoutineExercise(name: 'Katonai vállból nyomás állva rúddal (OHP)', defaultSets: 4, defaultReps: 8),
+      RoutineExercise(name: 'Katonai vállból nyomás rúddal (OHP)', defaultSets: 4, defaultReps: 8),
       RoutineExercise(name: 'Vállból nyomás kézisúlyzóval ülve', defaultSets: 4, defaultReps: 10),
       RoutineExercise(name: 'Arnold nyomás kézisúlyzóval', defaultSets: 3, defaultReps: 10),
       RoutineExercise(name: 'Oldalemelés kézisúlyzóval állva', defaultSets: 4, defaultReps: 15),
@@ -73,8 +52,8 @@ List<WorkoutCategory> getInitialWorkoutCategories() => [
       RoutineExercise(name: 'Előreemelés súlytárcsával', defaultSets: 3, defaultReps: 12),
       RoutineExercise(name: 'Tricepsz letolás csigán kötéllel', defaultSets: 4, defaultReps: 12),
       RoutineExercise(name: 'Tricepsz letolás egyenes rúddal', defaultSets: 4, defaultReps: 10),
-      RoutineExercise(name: 'Francia nyomás EZ rúddal (Koponyatörő)', defaultSets: 3, defaultReps: 10),
-      RoutineExercise(name: 'Tricepsznyújtás fej felett kézisúlyzóval', defaultSets: 3, defaultReps: 12),
+      RoutineExercise(name: 'Francia nyomás EZ rúddal', defaultSets: 3, defaultReps: 10),
+      RoutineExercise(name: 'Tricepsznyújtás fej felett', defaultSets: 3, defaultReps: 12),
       RoutineExercise(name: 'Szűkfogású fekvenyomás', defaultSets: 3, defaultReps: 8),
     ],
   ),
@@ -86,8 +65,8 @@ List<WorkoutCategory> getInitialWorkoutCategories() => [
     imageUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80',
     exercises: [
       RoutineExercise(name: 'Húzódzkodás széles felső fogással', defaultSets: 4, defaultReps: 8),
-      RoutineExercise(name: 'Húzódzkodás szűk alsó fogással (Chin-up)', defaultSets: 3, defaultReps: 8),
-      RoutineExercise(name: 'Lehúzás mellhez széles fogással csigán', defaultSets: 4, defaultReps: 10),
+      RoutineExercise(name: 'Húzódzkodás szűk alsó fogással', defaultSets: 3, defaultReps: 8),
+      RoutineExercise(name: 'Lehúzás mellhez széles fogással', defaultSets: 4, defaultReps: 10),
       RoutineExercise(name: 'Lehúzás szűk V-fogantyúval', defaultSets: 3, defaultReps: 10),
       RoutineExercise(name: 'Döntött törzsű evezés rúddal', defaultSets: 4, defaultReps: 8),
       RoutineExercise(name: 'Egykezes evezés kézisúlyzóval', defaultSets: 3, defaultReps: 10),
@@ -97,7 +76,7 @@ List<WorkoutCategory> getInitialWorkoutCategories() => [
       RoutineExercise(name: 'Hipernyújtás derékpadon', defaultSets: 3, defaultReps: 15),
       RoutineExercise(name: 'Face pull kötéllel felső csigán', defaultSets: 4, defaultReps: 15),
       RoutineExercise(name: 'Döntött oldalemelés hátsó vállra', defaultSets: 4, defaultReps: 12),
-      RoutineExercise(name: 'Vállvonogatás rúddal / súlyzóval (Trapéz)', defaultSets: 4, defaultReps: 12),
+      RoutineExercise(name: 'Vállvonogatás rúddal / súlyzóval', defaultSets: 4, defaultReps: 12),
       RoutineExercise(name: 'Bicepsz állva EZ francia rúddal', defaultSets: 4, defaultReps: 10),
       RoutineExercise(name: 'Bicepsz kézisúlyzóval váltott karral', defaultSets: 3, defaultReps: 10),
       RoutineExercise(name: 'Kalapács bicepsz kézisúlyzóval', defaultSets: 4, defaultReps: 12),
@@ -117,13 +96,12 @@ List<WorkoutCategory> getInitialWorkoutCategories() => [
       RoutineExercise(name: 'Elölguggolás rúddal (Front Squat)', defaultSets: 3, defaultReps: 8),
       RoutineExercise(name: 'Lábtoló gép 45 fokos szögben', defaultSets: 4, defaultReps: 10),
       RoutineExercise(name: 'Hack guggolás gépen', defaultSets: 3, defaultReps: 10),
-      RoutineExercise(name: 'Bolgár egylábas guggolás kézisúlyzóval', defaultSets: 3, defaultReps: 10),
+      RoutineExercise(name: 'Bolgár egylábas guggolás', defaultSets: 3, defaultReps: 10),
       RoutineExercise(name: 'Sétáló kitörés kézisúlyzókkal', defaultSets: 3, defaultReps: 12),
       RoutineExercise(name: 'Combfeszítő gép ülve', defaultSets: 4, defaultReps: 12),
       RoutineExercise(name: 'Combhajlító gép fekve', defaultSets: 4, defaultReps: 12),
-      RoutineExercise(name: 'Combhajlító gép ülve', defaultSets: 3, defaultReps: 12),
       RoutineExercise(name: 'Román felhúzás (RDL) súlyzóval', defaultSets: 4, defaultReps: 10),
-      RoutineExercise(name: 'Csípőemelés rúddal / gépen (Hip Thrust)', defaultSets: 4, defaultReps: 10),
+      RoutineExercise(name: 'Csípőemelés (Hip Thrust)', defaultSets: 4, defaultReps: 10),
       RoutineExercise(name: 'Álló vádliemelés gépen', defaultSets: 5, defaultReps: 15),
       RoutineExercise(name: 'Ülő vádligép', defaultSets: 4, defaultReps: 15),
     ],
@@ -135,14 +113,13 @@ List<WorkoutCategory> getInitialWorkoutCategories() => [
     iconBadge: '🏃',
     imageUrl: 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=800&q=80',
     exercises: [
-      RoutineExercise(name: 'Futópad – Egyenletes tempójú futás (Zone 2)', defaultSets: 1, defaultReps: 30),
-      RoutineExercise(name: 'Futópad – Döntött emelkedős gyaloglás (12-3-30)', defaultSets: 1, defaultReps: 30),
+      RoutineExercise(name: 'Futópad – Egyenletes futás (Zone 2)', defaultSets: 1, defaultReps: 30),
+      RoutineExercise(name: 'Futópad – Döntött emelkedős gyaloglás', defaultSets: 1, defaultReps: 30),
       RoutineExercise(name: 'Konditerem teremkerékpár (Spinning)', defaultSets: 1, defaultReps: 25),
-      RoutineExercise(name: 'Evezőgép intervallumok (500m sprint)', defaultSets: 4, defaultReps: 2),
-      RoutineExercise(name: 'Lépcsőzőgép (StairMaster) folyamatos', defaultSets: 1, defaultReps: 20),
-      RoutineExercise(name: 'Ugrókötelezés intervallumokban', defaultSets: 5, defaultReps: 60),
-      RoutineExercise(name: 'AirBike (Assault Bike) max sprint', defaultSets: 6, defaultReps: 30),
-      RoutineExercise(name: 'HIIT Tabata köredzés (Burpee, Mountain Climber)', defaultSets: 4, defaultReps: 4),
+      RoutineExercise(name: 'Evezőgép intervallumok (500m)', defaultSets: 4, defaultReps: 2),
+      RoutineExercise(name: 'Lépcsőzőgép (StairMaster)', defaultSets: 1, defaultReps: 20),
+      RoutineExercise(name: 'Ugrókötelezés', defaultSets: 5, defaultReps: 60),
+      RoutineExercise(name: 'AirBike max sprint', defaultSets: 6, defaultReps: 30),
     ],
   ),
   WorkoutCategory(
@@ -175,7 +152,7 @@ List<WorkoutCategory> getInitialWorkoutCategories() => [
       RoutineExercise(name: 'Combhajlító gép', defaultSets: 3, defaultReps: 12),
       RoutineExercise(name: 'Függeszkedve lábemelés kereten', defaultSets: 4, defaultReps: 15),
       RoutineExercise(name: 'Harangozás csigán (Cable Crunch)', defaultSets: 4, defaultReps: 15),
-      RoutineExercise(name: 'Plank tartás testsúllyal', defaultSets: 3, defaultReps: 60),
+      RoutineExercise(name: 'Plank tartás', defaultSets: 3, defaultReps: 60),
     ],
   ),
 ];
@@ -209,25 +186,16 @@ class _WorkoutTrackerTabState extends State<WorkoutTrackerTab> {
         paths[cat.id] = savedPath;
       }
     }
-    setState(() {
-      _customImagePaths.addAll(paths);
-    });
+    setState(() => _customImagePaths.addAll(paths));
   }
 
   Future<void> _pickImageForCategory(String categoryId, ImageSource source) async {
     try {
-      final XFile? picked = await _picker.pickImage(
-        source: source,
-        maxWidth: 1600,
-        maxHeight: 1200,
-        imageQuality: 85,
-      );
+      final XFile? picked = await _picker.pickImage(source: source, maxWidth: 1600, maxHeight: 1200, imageQuality: 85);
       if (picked != null) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('workout_cover_$categoryId', picked.path);
-        setState(() {
-          _customImagePaths[categoryId] = picked.path;
-        });
+        setState(() => _customImagePaths[categoryId] = picked.path);
       }
     } catch (_) {}
   }
@@ -274,9 +242,8 @@ class _WorkoutTrackerTabState extends State<WorkoutTrackerTab> {
                   color: Colors.transparent,
                   child: InkWell(
                     borderRadius: BorderRadius.circular(20),
-                    onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (ctx) => WorkoutDetailScreen(category: cat)));
-                    },
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (ctx) => WorkoutDetailScreen(category: cat))),
+                    onLongPress: () => _pickImageForCategory(cat.id, ImageSource.gallery),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                       child: Row(
@@ -328,25 +295,14 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen> {
   Future<void> _activateWorkout() async {
     final prefs = await SharedPreferences.getInstance();
     final selectedList = _exercises.where((e) => _selectedExerciseNames.contains(e.name)).toList();
-
-    final plannedItems = selectedList.map((e) => {
-      'name': e.name,
-      'targetSets': e.defaultSets,
-      'targetReps': e.defaultReps,
-      'completedSets': 0,
-    }).toList();
-
-    final workoutTitle = selectedList.isNotEmpty
-        ? "${widget.category.title.split(' ')[0]} (${selectedList.length} gyakorlat)"
-        : "${widget.category.title.split(' ')[0]} (Szabad edzés)";
+    final plannedItems = selectedList.map((e) => {'name': e.name, 'targetSets': e.defaultSets, 'targetReps': e.defaultReps, 'completedSets': 0}).toList();
+    final workoutTitle = selectedList.isNotEmpty ? "${widget.category.title.split(' ')[0]} (${selectedList.length} gyakorlat)" : "${widget.category.title.split(' ')[0]} (Szabad edzés)";
 
     await prefs.setString('daily_workout_type', workoutTitle);
     await prefs.setString('daily_planned_exercises', jsonEncode(plannedItems));
 
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$workoutTitle sikeresen aktiválva! 💪'), backgroundColor: _theme.primaryColor),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$workoutTitle aktiválva! 💪'), backgroundColor: _theme.primaryColor));
       Navigator.pop(context);
     }
   }
@@ -358,10 +314,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen> {
       builder: (context, _) {
         return Scaffold(
           backgroundColor: _theme.backgroundColor,
-          appBar: AppBar(
-            backgroundColor: _theme.backgroundColor,
-            title: Text(widget.category.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16)),
-          ),
+          appBar: AppBar(backgroundColor: _theme.backgroundColor, title: Text(widget.category.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16))),
           bottomNavigationBar: Container(
             padding: const EdgeInsets.all(16),
             color: _theme.cardColor,
@@ -369,10 +322,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen> {
               style: ElevatedButton.styleFrom(backgroundColor: _theme.primaryColor, padding: const EdgeInsets.symmetric(vertical: 16)),
               onPressed: _activateWorkout,
               icon: const Icon(Icons.flash_on_rounded, color: Color(0xFF07101B)),
-              label: Text(
-                _selectedExerciseNames.isNotEmpty ? 'EDZÉS AKTIVÁLÁSA (${_selectedExerciseNames.length})' : 'SZABAD EDZÉS INDÍTÁSA',
-                style: const TextStyle(color: Color(0xFF07101B), fontWeight: FontWeight.w900),
-              ),
+              label: Text(_selectedExerciseNames.isNotEmpty ? 'EDZÉS AKTIVÁLÁSA (${_selectedExerciseNames.length})' : 'SZABAD EDZÉS INDÍTÁSA', style: const TextStyle(color: Color(0xFF07101B), fontWeight: FontWeight.w900)),
             ),
           ),
           body: ListView.builder(
@@ -392,15 +342,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen> {
                   activeColor: _theme.primaryColor,
                   checkColor: const Color(0xFF07101B),
                   value: isSelected,
-                  onChanged: (val) {
-                    setState(() {
-                      if (val == true) {
-                        _selectedExerciseNames.add(ex.name);
-                      } else {
-                        _selectedExerciseNames.remove(ex.name);
-                      }
-                    });
-                  },
+                  onChanged: (val) => setState(() => val == true ? _selectedExerciseNames.add(ex.name) : _selectedExerciseNames.remove(ex.name)),
                   title: Text(ex.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
                   subtitle: Text('${ex.defaultSets} széria × ${ex.defaultReps} ismétlés', style: const TextStyle(color: Color(0xFF91A2B5), fontSize: 11)),
                 ),
