@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/theme_service.dart';
 import '../models/recipe_model.dart';
+import 'recipes_screen.dart';
 
 class DashboardTab extends StatefulWidget {
   const DashboardTab({super.key});
@@ -14,7 +15,6 @@ class DashboardTab extends StatefulWidget {
 class _DashboardTabState extends State<DashboardTab> {
   final ThemeService _theme = ThemeService();
 
-  // Kártyák azonosítói és alapértelmezett sorrendje
   List<String> _cardOrder = [
     'summary',
     'workout',
@@ -402,13 +402,27 @@ class _DashboardTabState extends State<DashboardTab> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('AJÁNLOTT RECEPT', style: TextStyle(color: _theme.secondaryColor, fontWeight: FontWeight.w900, fontSize: 11, letterSpacing: 0.8)),
-              Text('${sampleRecipe.calories} kcal', style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold)),
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (ctx) => const RecipesScreen()),
+                  );
+                },
+                child: Row(
+                  children: [
+                    Text('ÖSSZES RECEPT', style: TextStyle(color: _theme.primaryColor, fontWeight: FontWeight.w900, fontSize: 11)),
+                    const SizedBox(width: 4),
+                    Icon(Icons.arrow_forward_rounded, color: _theme.primaryColor, size: 14),
+                  ],
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(sampleRecipe.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
           const SizedBox(height: 4),
-          Text('Elkészítés: ${sampleRecipe.prepTime} • ${sampleRecipe.protein}g Fehérje', style: const TextStyle(color: Color(0xFF91A2B5), fontSize: 12)),
+          Text('Elkészítés: ${sampleRecipe.prepTime} • ${sampleRecipe.protein}g Fehérje • ${sampleRecipe.calories} kcal', style: const TextStyle(color: Color(0xFF91A2B5), fontSize: 12)),
         ],
       ),
     );
