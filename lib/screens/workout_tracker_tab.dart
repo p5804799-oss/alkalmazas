@@ -38,7 +38,7 @@ class WorkoutCategory {
   final String imageUrl;
   final List<RoutineExercise> exercises;
 
-  const WorkoutCategory({
+  WorkoutCategory({
     required this.id,
     required this.title,
     required this.subtitle,
@@ -48,7 +48,7 @@ class WorkoutCategory {
   });
 }
 
-const List<WorkoutCategory> kInitialWorkoutCategories = [
+List<WorkoutCategory> getInitialWorkoutCategories() => [
   WorkoutCategory(
     id: 'push',
     title: 'PUSH',
@@ -178,17 +178,19 @@ class _WorkoutTrackerTabState extends State<WorkoutTrackerTab> {
   final ThemeService _theme = ThemeService();
   final ImagePicker _picker = ImagePicker();
   final Map<String, String> _customImagePaths = {};
+  late final List<WorkoutCategory> _categories;
 
   @override
   void initState() {
     super.initState();
+    _categories = getInitialWorkoutCategories();
     _loadCustomCoverImages();
   }
 
   Future<void> _loadCustomCoverImages() async {
     final prefs = await SharedPreferences.getInstance();
     final Map<String, String> paths = {};
-    for (var cat in kInitialWorkoutCategories) {
+    for (var cat in _categories) {
       final savedPath = prefs.getString('workout_cover_${cat.id}');
       if (savedPath != null && File(savedPath).existsSync()) {
         paths[cat.id] = savedPath;
@@ -325,7 +327,7 @@ class _WorkoutTrackerTabState extends State<WorkoutTrackerTab> {
                   style: TextStyle(color: Color(0xFF91A2B5), fontSize: 12),
                 ),
                 const SizedBox(height: 18),
-                ...kInitialWorkoutCategories.map((cat) => _buildWorkoutCard(context, cat)),
+                ..._categories.map((cat) => _buildWorkoutCard(context, cat)),
               ],
             ),
           ),

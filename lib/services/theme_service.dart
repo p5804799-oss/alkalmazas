@@ -1,93 +1,99 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class AppThemeOption {
+class ThemePreset {
   final String id;
   final String name;
-  final Color primaryAccent;
-  final Color secondaryAccent;
-  final Color cardBg;
+  final Color primary;
+  final Color secondary;
+  final Color background;
+  final Color card;
 
-  const AppThemeOption({
+  const ThemePreset({
     required this.id,
     required this.name,
-    required this.primaryAccent,
-    required this.secondaryAccent,
-    required this.cardBg,
+    required this.primary,
+    required this.secondary,
+    required this.background,
+    required this.card,
   });
 }
+
+const List<ThemePreset> kAppThemePresets = [
+  ThemePreset(
+    id: 'cyberpunk_cyan',
+    name: 'Cyberpunk Cián',
+    primary: Color(0xFF28D5CF),
+    secondary: Color(0xFFFF356D),
+    background: Color(0xFF07101B),
+    card: Color(0xFF0D1825),
+  ),
+  ThemePreset(
+    id: 'deep_amethyst',
+    name: 'Mély Ametiszt',
+    primary: Color(0xFFB347EB),
+    secondary: Color(0xFF00FFC2),
+    background: Color(0xFF100720),
+    card: Color(0xFF190D32),
+  ),
+  ThemePreset(
+    id: 'emerald_matrix',
+    name: 'Smaragd Mátrix',
+    primary: Color(0xFF00E676),
+    secondary: Color(0xFFFFB300),
+    background: Color(0xFF05170E),
+    card: Color(0xFF0B2618),
+  ),
+  ThemePreset(
+    id: 'magma_blood',
+    name: 'Vulkán Vörös',
+    primary: Color(0xFFFF3D00),
+    secondary: Color(0xFFFFD600),
+    background: Color(0xFF1A0808),
+    card: Color(0xFF2B0F0F),
+  ),
+  ThemePreset(
+    id: 'midnight_oled',
+    name: 'Éjfekete OLED',
+    primary: Color(0xFF00B0FF),
+    secondary: Color(0xFFFF4081),
+    background: Color(0xFF000000),
+    card: Color(0xFF121212),
+  ),
+];
 
 class ThemeService extends ChangeNotifier {
   static final ThemeService _instance = ThemeService._internal();
   factory ThemeService() => _instance;
-  ThemeService._internal();
+  ThemeService._internal() {
+    _loadTheme();
+  }
 
-  static const List<AppThemeOption> presets = [
-    AppThemeOption(
-      id: 'default_cyan',
-      name: 'Neon Cián & Pink (Alapértelmezett)',
-      primaryAccent: Color(0xFF28D5CF),
-      secondaryAccent: Color(0xFFFF356D),
-      cardBg: Color(0xFF0D1825),
-    ),
-    AppThemeOption(
-      id: 'cyberpunk_purple',
-      name: 'Cyberpunk (Lila & Neonsárga)',
-      primaryAccent: Color(0xFFA855F7),
-      secondaryAccent: Color(0xFFEAB308),
-      cardBg: Color(0xFF140F2D),
-    ),
-    AppThemeOption(
-      id: 'crimson_beast',
-      name: 'Vérvörös Beast (Piros & Narancs)',
-      primaryAccent: Color(0xFFFF334B),
-      secondaryAccent: Color(0xFFFF8A00),
-      cardBg: Color(0xFF1F0E12),
-    ),
-    AppThemeOption(
-      id: 'emerald_gold',
-      name: 'Emerald & Arany (Luxus Zöld)',
-      primaryAccent: Color(0xFF10B981),
-      secondaryAccent: Color(0xFFFBBF24),
-      cardBg: Color(0xFF061A14),
-    ),
-    AppThemeOption(
-      id: 'monochrome_dark',
-      name: 'Ultra Dark (Minimal Szürke)',
-      primaryAccent: Color(0xFFE2E8F0),
-      secondaryAccent: Color(0xFF64748B),
-      cardBg: Color(0xFF121820),
-    ),
-  ];
+  String _currentThemeId = 'cyberpunk_cyan';
 
-  Color primaryColor = const Color(0xFF28D5CF);
-  Color secondaryColor = const Color(0xFFFF356D);
-  Color cardColor = const Color(0xFF0D1825);
-  String activePresetId = 'default_cyan';
+  Color get primaryColor => _findTheme(_currentThemeId).primary;
+  Color get secondaryColor => _findTheme(_currentThemeId).secondary;
+  Color get backgroundColor => _findTheme(_currentThemeId).background;
+  Color get cardColor => _findTheme(_currentThemeId).card;
+  String get currentThemeId => _currentThemeId;
 
-  Future<void> init() async {
-    final prefs = await SharedPreferences.getInstance();
-    activePresetId = prefs.getString('app_theme_preset') ?? 'default_cyan';
-    
-    final matching = presets.firstWhere(
-      (p) => p.id == activePresetId,
-      orElse: () => presets.first,
+  ThemePreset _findTheme(String id) {
+    return kAppThemePresets.firstWhere(
+      (t) => t.id == id,
+      orElse: () => kAppThemePresets.first,
     );
-    
-    primaryColor = matching.primaryAccent;
-    secondaryColor = matching.secondaryAccent;
-    cardColor = matching.cardBg;
+  }
+
+  Future<void> _loadTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    _currentThemeId = prefs.getString('app_theme_id') ?? 'cyberpunk_cyan';
     notifyListeners();
   }
 
-  Future<void> setPreset(AppThemeOption preset) async {
-    primaryColor = preset.primaryAccent;
-    secondaryColor = preset.secondaryAccent;
-    cardColor = preset.cardBg;
-    activePresetId = preset.id;
-    
+  Future<void> setTheme(String id) async {
+    _currentThemeId = id;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('app_theme_preset', preset.id);
+    await prefs.setString('app_theme_id', id);
     notifyListeners();
   }
 }
