@@ -1,0 +1,79 @@
+﻿name: Multiplatform Build (Android, iOS, Windows)
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+      - name: Build Android APK
+        run: |
+          flutter pub get
+          flutter build apk --release
+      - name: Upload Android APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Android-APK
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+  build-ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+      - name: Build iOS IPA without signing
+        run: |
+          flutter pub get
+          flutter build ios --release --no-codesign
+          cd build/ios/iphoneos
+          mkdir -p Payload
+          cp -r Runner.app Payload/
+          zip -r App.ipa Payload
+      - name: Upload iOS Sideloadable IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: iOS-IPA-Sideloadable
+          path: build/ios/iphoneos/App.ipa
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+      - name: Enable Windows Desktop
+        run: flutter config --enable-windows-desktop
+      - name: Build Windows EXE
+        run: |
+          flutter pub get
+          flutter build windows --release
+      - name: Archive Windows Release
+        shell: pwsh
+        run: |
+          Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath Windows-App.zip
+      - name: Upload Windows EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: Windows-EXE
+          path: Windows-App.zip
