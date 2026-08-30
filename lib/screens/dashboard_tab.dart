@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/workout_presets.dart';
 import '../services/gemini_food_service.dart';
@@ -112,6 +113,7 @@ class DashboardTab extends StatefulWidget {
 }
 
 class _DashboardTabState extends State<DashboardTab> {
+  DateTime _selectedDate = DateTime.now();
   int _targetCalories = 2400;
   final double _targetProtein = 160.0;
   final double _targetCarbs = 250.0;
@@ -138,6 +140,15 @@ class _DashboardTabState extends State<DashboardTab> {
   bool _isAnalyzingPhoto = false;
 
   final ImagePicker _picker = ImagePicker();
+
+  String get _dateKeyFormatted => DateFormat('yyyy-MM-dd').format(_selectedDate);
+
+  bool get _isToday {
+    final now = DateTime.now();
+    return _selectedDate.year == now.year &&
+        _selectedDate.month == now.month &&
+        _selectedDate.day == now.day;
+  }
 
   @override
   void initState() {
@@ -166,18 +177,21 @@ class _DashboardTabState extends State<DashboardTab> {
   Future<void> _loadDashboardData() async {
     final prefs = await SharedPreferences.getInstance();
     _targetCalories = prefs.getInt('daily_target_calories') ?? 2400;
-    final String? mealData = prefs.getString('daily_meals_data');
-    final String? exerciseData = prefs.getString('daily_planned_exercises');
-    final String? savedWorkoutType = prefs.getString('daily_workout_type');
+
+    final String dateKey = _dateKeyFormatted;
+    final String? mealData = prefs.getString('daily_meals_$dateKey') ?? (_isToday ? prefs.getString('daily_meals_data') : null);
+    final String? exerciseData = prefs.getString('daily_planned_exercises_$dateKey') ?? (_isToday ? prefs.getString('daily_planned_exercises') : null);
+    final String? savedWorkoutType = prefs.getString('daily_workout_type_$dateKey') ?? (_isToday ? prefs.getString('daily_workout_type') : null);
 
     setState(() {
-      if (savedWorkoutType != null) {
-        _workoutDayType = savedWorkoutType;
-      }
+      _workoutDayType = savedWorkoutType ?? (_isToday ? 'Mell - Tricepsz 💪' : 'Pihenőnap 😴');
       if (mealData != null && mealData.isNotEmpty) {
         final List<dynamic> decoded = jsonDecode(mealData);
         _meals = decoded.map((m) => MealItem.fromMap(m)).toList();
+      } else {
+        _meals = [];
       }
+
       if (exerciseData != null && exerciseData.isNotEmpty) {
         final List<dynamic> decoded = jsonDecode(exerciseData);
         _todayExercises = decoded.map((e) => PlannedExerciseItem.fromMap(e)).toList();
@@ -189,9 +203,51 @@ class _DashboardTabState extends State<DashboardTab> {
 
   Future<void> _saveDashboardData() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('daily_workout_type', _workoutDayType);
-    await prefs.setString('daily_meals_data', jsonEncode(_meals.map((m) => m.toMap()).toList()));
-    await prefs.setString('daily_planned_exercises', jsonEncode(_todayExercises.map((e) => e.toMap()).toList()));
+    final String dateKey = _dateKeyFormatted;
+    await prefs.setString('daily_workout_type_$dateKey', _workoutDayType);
+    await prefs.setString('daily_meals_$dateKey', jsonEncode(_meals.map((m) => m.toMap()).toList()));
+    await prefs.setString('daily_planned_exercises_$dateKey', jsonEncode(_todayExercises.map((e) => e.toMap()).toList()));
+
+    if (_isToday) {
+      await prefs.setString('daily_workout_type', _workoutDayType);
+      await prefs.setString('daily_meals_data', jsonEncode(_meals.map((m) => m.toMap()).toList()));
+      await prefs.setString('daily_planned_exercises', jsonEncode(_todayExercises.map((e) => e.toMap()).toList()));
+    }
+  }
+
+  void _changeDate(int offsetDays) {
+    setState(() {
+      _selectedDate = _selectedDate.add(Duration(days: offsetDays));
+    });
+    _loadDashboardData();
+  }
+
+  Future<void> _selectCustomDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2023),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.dark(
+              primary: Color(0xFF28D5CF),
+              onPrimary: Color(0xFF07101B),
+              surface: Color(0xFF0D1825),
+              onSurface: Colors.white,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
+      _loadDashboardData();
+    }
   }
 
   Future<double> _getLastLoggedWeightForExercise(String exerciseName) async {
@@ -366,7 +422,7 @@ class _DashboardTabState extends State<DashboardTab> {
                       'exerciseName': exercise.name,
                       'weightKg': w,
                       'reps': r,
-                      'date': DateTime.now().toIso8601String(),
+                      'date': _selectedDate.toIso8601String(),
                     });
                     await prefs.setString('exercise_progress_logs', jsonEncode(logs));
 
@@ -649,6 +705,7 @@ class _DashboardTabState extends State<DashboardTab> {
   Widget build(BuildContext context) {
     final remainingCalories = _targetCalories - _consumedCalories;
     final calorieProgress = (_consumedCalories / _targetCalories).clamp(0.0, 1.0);
+    final String displayDateStr = _isToday ? 'Ma (${DateFormat('MM. dd.').format(_selectedDate)})' : DateFormat('yyyy. MM. dd. (EEEE)', 'hu').format(_selectedDate);
 
     return Scaffold(
       backgroundColor: const Color(0xFF07101B),
@@ -688,6 +745,51 @@ class _DashboardTabState extends State<DashboardTab> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Dátumválasztó Bar
+            Container(
+              margin: const EdgeInsets.only(bottom: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0D1825),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFF26364A)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.chevron_left_rounded, color: Color(0xFF28D5CF), size: 28),
+                    onPressed: () => _changeDate(-1),
+                  ),
+                  InkWell(
+                    onTap: _selectCustomDate,
+                    borderRadius: BorderRadius.circular(10),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.calendar_month_rounded, size: 18, color: Color(0xFF28D5CF)),
+                          const SizedBox(width: 8),
+                          Text(
+                            displayDateStr,
+                            style: TextStyle(
+                              color: _isToday ? const Color(0xFF28D5CF) : Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.chevron_right_rounded, color: Color(0xFF28D5CF), size: 28),
+                    onPressed: () => _changeDate(1),
+                  ),
+                ],
+              ),
+            ),
+
             if (_isAnalyzingPhoto)
               Container(
                 margin: const EdgeInsets.only(bottom: 16),
@@ -769,7 +871,7 @@ class _DashboardTabState extends State<DashboardTab> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Mai edzésprogram:', style: TextStyle(color: Color(0xFF91A2B5), fontSize: 11)),
+                          const Text('Napi edzésprogram:', style: TextStyle(color: Color(0xFF91A2B5), fontSize: 11)),
                           Text(
                             _workoutDayType,
                             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
@@ -864,7 +966,7 @@ class _DashboardTabState extends State<DashboardTab> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Mai Gyakorlatok & Szériák',
+                const Text('Gyakorlatok & Szériák',
                     style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold)),
                 Text('${_todayExercises.where((e) => e.completedSets >= e.targetSets).length}/${_todayExercises.length} kész',
                     style: const TextStyle(color: Color(0xFF28D5CF), fontWeight: FontWeight.bold, fontSize: 12)),
@@ -873,8 +975,8 @@ class _DashboardTabState extends State<DashboardTab> {
             const SizedBox(height: 10),
             if (_todayExercises.isEmpty)
               _buildEmptyPlaceholder(_workoutDayType == 'Pihenőnap 😴'
-                  ? 'A mai nap a regenerációé! Pihenj és egyél eleget! 😴'
-                  : 'Nincs betöltött gyakorlat. Válassz egy edzéstervet fent!')
+                  ? 'Erre a napra nincs edzés rögzítve (Pihenőnap 😴).'
+                  : 'Nincs betöltött gyakorlat erre a napra.')
             else
               ListView.builder(
                 shrinkWrap: true,
@@ -952,11 +1054,11 @@ class _DashboardTabState extends State<DashboardTab> {
 
             const SizedBox(height: 24),
 
-            // Napi Ételek Szekció AI Fotó gombbal
+            // Napi Ételek Szekció
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Mai Étkezések',
+                const Text('Étkezések',
                     style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold)),
                 Row(
                   children: [
@@ -982,7 +1084,7 @@ class _DashboardTabState extends State<DashboardTab> {
               ],
             ),
             if (_meals.isEmpty)
-              _buildEmptyPlaceholder('Még nem rögzítettél ételt a mai napon.')
+              _buildEmptyPlaceholder('Erre a napra még nincs rögzített étkezés.')
             else
               ListView.builder(
                 shrinkWrap: true,
