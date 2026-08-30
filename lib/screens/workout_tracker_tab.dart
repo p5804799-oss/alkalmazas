@@ -1,6 +1,8 @@
 ﻿import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/theme_service.dart';
 
@@ -174,6 +176,115 @@ class WorkoutTrackerTab extends StatefulWidget {
 
 class _WorkoutTrackerTabState extends State<WorkoutTrackerTab> {
   final ThemeService _theme = ThemeService();
+  final ImagePicker _picker = ImagePicker();
+  final Map<String, String> _customImagePaths = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCustomCoverImages();
+  }
+
+  Future<void> _loadCustomCoverImages() async {
+    final prefs = await SharedPreferences.getInstance();
+    final Map<String, String> paths = {};
+    for (var cat in kInitialWorkoutCategories) {
+      final savedPath = prefs.getString('workout_cover_${cat.id}');
+      if (savedPath != null && File(savedPath).existsSync()) {
+        paths[cat.id] = savedPath;
+      }
+    }
+    setState(() {
+      _customImagePaths.addAll(paths);
+    });
+  }
+
+  Future<void> _pickImageForCategory(String categoryId, ImageSource source) async {
+    try {
+      final XFile? picked = await _picker.pickImage(
+        source: source,
+        maxWidth: 1600,
+        maxHeight: 1200,
+        imageQuality: 85,
+      );
+      if (picked != null) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('workout_cover_$categoryId', picked.path);
+        setState(() {
+          _customImagePaths[categoryId] = picked.path;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: const Text('Egyéni borítókép sikeresen beállítva! 📸'), backgroundColor: _theme.primaryColor),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Hiba a kép beállításakor: $e'), backgroundColor: _theme.secondaryColor),
+        );
+      }
+    }
+  }
+
+  void _showChangeCoverSheet(WorkoutCategory cat) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: _theme.backgroundColor,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('${cat.title} Borítókép Módosítása 📸', style: TextStyle(color: _theme.primaryColor, fontWeight: FontWeight.bold, fontSize: 18)),
+            const SizedBox(height: 6),
+            const Text('Válassz saját fotót az edzéskártya hátterének:', style: TextStyle(color: Color(0xFF91A2B5), fontSize: 12)),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: Icon(Icons.photo_library_rounded, color: _theme.primaryColor),
+              title: const Text('Kép kiválasztása galériából', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              onTap: () {
+                Navigator.pop(ctx);
+                _pickImageForCategory(cat.id, ImageSource.gallery);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.camera_alt_rounded, color: _theme.secondaryColor),
+              title: const Text('Új fotó készítése kamerával', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              onTap: () {
+                Navigator.pop(ctx);
+                _pickImageForCategory(cat.id, ImageSource.camera);
+              },
+            ),
+            if (_customImagePaths.containsKey(cat.id))
+              ListTile(
+                leading: const Icon(Icons.refresh_rounded, color: Color(0xFF91A2B5)),
+                title: const Text('Alapértelmezett kép visszaállítása', style: TextStyle(color: Color(0xFF91A2B5))),
+                onTap: () async {
+                  Navigator.pop(ctx);
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.remove('workout_cover_${cat.id}');
+                  setState(() {
+                    _customImagePaths.remove(cat.id);
+                  });
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  ImageProvider _getImageProvider(WorkoutCategory cat) {
+    final customPath = _customImagePaths[cat.id];
+    if (customPath != null && File(customPath).existsSync()) {
+      return FileImage(File(customPath));
+    }
+    return NetworkImage(cat.imageUrl);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -210,7 +321,7 @@ class _WorkoutTrackerTabState extends State<WorkoutTrackerTab> {
                 ),
                 const SizedBox(height: 4),
                 const Text(
-                  'Válassz kategóriát, állítsd be a szériákat és ismétléseket!',
+                  'Koppints a tervezéshez, tartsd hosszan nyomva saját fotó beállításához!',
                   style: TextStyle(color: Color(0xFF91A2B5), fontSize: 12),
                 ),
                 const SizedBox(height: 18),
@@ -232,7 +343,7 @@ class _WorkoutTrackerTabState extends State<WorkoutTrackerTab> {
         borderRadius: BorderRadius.circular(22),
         border: Border.all(color: const Color(0xFF1F2F42), width: 1.5),
         image: DecorationImage(
-          image: NetworkImage(cat.imageUrl),
+          image: _getImageProvider(cat),
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(
             _theme.backgroundColor.withValues(alpha: 0.72),
@@ -250,6 +361,7 @@ class _WorkoutTrackerTabState extends State<WorkoutTrackerTab> {
               MaterialPageRoute(builder: (ctx) => WorkoutDetailScreen(category: cat)),
             );
           },
+          onLongPress: () => _showChangeCoverSheet(cat),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             child: Row(
@@ -276,13 +388,7 @@ class _WorkoutTrackerTabState extends State<WorkoutTrackerTab> {
                     ),
                   ],
                 ),
-                Row(
-                  children: [
-                    Text(cat.iconBadge, style: TextStyle(color: _theme.primaryColor, fontSize: 18, fontWeight: FontWeight.bold)),
-                    const SizedBox(width: 8),
-                    Icon(Icons.arrow_forward_rounded, color: _theme.primaryColor, size: 26),
-                  ],
-                ),
+                Icon(Icons.arrow_forward_rounded, color: _theme.primaryColor, size: 28),
               ],
             ),
           ),
