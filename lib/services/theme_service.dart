@@ -17,6 +17,11 @@ class ThemePreset {
     required this.background,
     required this.card,
   });
+
+  // Kompatibilitási getterek a Dev Designer számára
+  Color get primaryAccent => primary;
+  Color get secondaryAccent => secondary;
+  Color get cardBg => card;
 }
 
 const List<ThemePreset> kAppThemePresets = [
