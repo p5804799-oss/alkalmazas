@@ -105,7 +105,7 @@ class _ProfileTabState extends State<ProfileTab> {
                         title: const Text('Valós idejű online szinkronizáció', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
                         subtitle: const Text('Edzések és meghívók küldése a barátoknak', style: TextStyle(color: Color(0xFF91A2B5), fontSize: 11)),
                         value: _onlineSyncEnabled,
-                        activeColor: _theme.primaryColor,
+                        activeThumbColor: _theme.primaryColor,
                         onChanged: (val) => setState(() => _onlineSyncEnabled = val),
                       ),
                     ],
