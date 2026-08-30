@@ -561,9 +561,11 @@ class _DashboardTabState extends State<DashboardTab> {
                               onTap: () => onSelected(option),
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                                border: index < options.length - 1
-                                    ? const Border(bottom: BorderSide(color: Color(0xFF1B2A3D)))
-                                    : null,
+                                decoration: BoxDecoration(
+                                  border: index < options.length - 1
+                                      ? const Border(bottom: BorderSide(color: Color(0xFF1B2A3D)))
+                                      : null,
+                                ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [

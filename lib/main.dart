@@ -11,7 +11,11 @@ void main() async {
     DeviceOrientation.portraitUp,
   ]);
 
-  await NotificationService.initNotification();
+  try {
+    await NotificationService.init();
+  } catch (_) {
+    // Ha az inicializálás nem sikerül háttérben, az app ettől még indul
+  }
   await ThemeService().init();
 
   runApp(const DagiFitnessApp());

@@ -1,14 +1,17 @@
-name: Build Android and iOS Apps
+﻿name: Build Multiplatform Apps
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
   build-android:
     name: Build Android APK
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -23,7 +26,6 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          cache: true
 
       - name: Install dependencies
         run: flutter pub get
@@ -31,15 +33,16 @@ jobs:
       - name: Build Android Release APK
         run: flutter build apk --release
 
-      - name: Upload APK Artifact
+      - name: Upload Android APK
         uses: actions/upload-artifact@v4
         with:
-          name: FutyFurutty-Android-APK
+          name: DagiApp-Android-APK
           path: build/app/outputs/flutter-apk/app-release.apk
 
   build-ios:
     name: Build iOS IPA
-    runs-on: macos-14
+    runs-on: macos-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -48,21 +51,60 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          cache: true
 
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build iOS Application
+      - name: Build iOS without Code Signing
         run: |
-          flutter build ios --release --no-codesign
-          cd build/ios/iphoneos
-          mkdir -p Payload
-          cp -r Runner.app Payload/
-          zip -r FutyFurutty_iOS.ipa Payload
+          flutter build ios --release --no-codesign --config-only
+          cd ios
+          xcodebuild build -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath ../build/ios_derived \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY=""
 
-      - name: Upload IPA Artifact
+      - name: Package Unsigned IPA
+        run: |
+          mkdir -p build/ios/Payload
+          cp -r build/ios_derived/Build/Products/Release-iphoneos/Runner.app build/ios/Payload/
+          cd build/ios
+          zip -r DagiApp.ipa Payload
+
+      - name: Upload iOS IPA
         uses: actions/upload-artifact@v4
         with:
-          name: FutyFurutty-iOS-Package
-          path: build/ios/iphoneos/FutyFurutty_iOS.ipa
+          name: DagiApp-iOS-IPA
+          path: build/ios/DagiApp.ipa
+
+  build-windows:
+    name: Build Windows EXE
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Enable Windows Desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Windows Release
+        run: flutter build windows --release
+
+      - name: Upload Windows Bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: DagiApp-Windows-Release
+          path: build/windows/x64/runner/Release/

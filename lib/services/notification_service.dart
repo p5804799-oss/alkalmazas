@@ -3,31 +3,31 @@ import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
-  static final FlutterLocalNotificationsPlugin _notifications =
+  static final FlutterLocalNotificationsPlugin _notificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
   static Future<void> init() async {
     tz.initializeTimeZones();
 
-    const androidSettings =
+    const AndroidInitializationSettings androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-    const iosSettings = DarwinInitializationSettings(
+
+    const DarwinInitializationSettings iosSettings =
+        DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
       requestSoundPermission: true,
     );
 
-    const settings = InitializationSettings(
+    const InitializationSettings initSettings = InitializationSettings(
       android: androidSettings,
       iOS: iosSettings,
     );
 
-    await _notifications.initialize(settings);
+    await _notificationsPlugin.initialize(initSettings);
   }
 
-  static Future<void> cancelCustomReminder() async {
-    await _notifications.cancel(100);
-  }
+  static Future<void> initNotification() async => init();
 
   static Future<void> scheduleIntervalReminder({
     required String title,
@@ -36,25 +36,32 @@ class NotificationService {
   }) async {
     await cancelCustomReminder();
 
-    await _notifications.zonedSchedule(
-      100,
-      title.isEmpty ? 'Emlékeztető' : title,
-      body.isEmpty ? 'Ideje ránézni az appra!' : body,
+    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+      'dagi_app_reminders',
+      'Dagi Emlékeztetők',
+      channelDescription: 'Értesítések étkezésről és edzésről',
+      importance: Importance.high,
+      priority: Priority.high,
+    );
+
+    const NotificationDetails notificationDetails = NotificationDetails(
+      android: androidDetails,
+      iOS: DarwinNotificationDetails(),
+    );
+
+    await _notificationsPlugin.zonedSchedule(
+      1001,
+      title,
+      body,
       tz.TZDateTime.now(tz.local).add(Duration(hours: intervalHours)),
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'custom_interval_channel',
-          'Egyedi Értesítések',
-          channelDescription: 'Felhasználó által megadott gyakoriságú értesítések',
-          importance: Importance.max,
-          priority: Priority.high,
-        ),
-        iOS: DarwinNotificationDetails(),
-      ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      notificationDetails,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
       matchDateTimeComponents: DateTimeComponents.time,
     );
+  }
+
+  static Future<void> cancelCustomReminder() async {
+    await _notificationsPlugin.cancel(1001);
   }
 }

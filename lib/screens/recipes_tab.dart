@@ -1,4 +1,3 @@
-@'
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -587,4 +586,3 @@ class _RecipesTabState extends State<RecipesTab> {
     );
   }
 }
-'@ | Set-Content -Path "lib/screens/recipes_tab.dart" -Encoding UTF8
