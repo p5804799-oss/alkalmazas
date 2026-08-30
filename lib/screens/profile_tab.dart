@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../services/theme_service.dart';
 
 class ProfileTab extends StatefulWidget {
   const ProfileTab({super.key});
@@ -9,6 +10,7 @@ class ProfileTab extends StatefulWidget {
 }
 
 class _ProfileTabState extends State<ProfileTab> {
+  final ThemeService _theme = ThemeService();
   String _username = 'Peti';
   String _userTag = '#PETI_8472';
   double _currentWeight = 85.0;
@@ -18,7 +20,6 @@ class _ProfileTabState extends State<ProfileTab> {
   String _gender = 'Férfi';
   String _activityLevel = 'Mérsékelten aktív (3-5 edzés/hét)';
 
-  // Adatvédelmi beállítások a barátlistához
   bool _shareWeight = true;
   bool _shareMeals = true;
   bool _shareWorkouts = true;
@@ -54,7 +55,6 @@ class _ProfileTabState extends State<ProfileTab> {
   }
 
   void _calculateTdee() {
-    // Mifflin-St Jeor képlet
     double bmr;
     if (_gender == 'Férfi') {
       bmr = (10 * _currentWeight) + (6.25 * _heightCm) - (5 * _age) + 5;
@@ -91,9 +91,9 @@ class _ProfileTabState extends State<ProfileTab> {
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Profil és számított kalóriacél elmentve!'),
-          backgroundColor: Color(0xFF28D5CF),
+        SnackBar(
+          content: const Text('Profil és számított kalóriacél elmentve!'),
+          backgroundColor: _theme.primaryColor,
         ),
       );
     }
@@ -159,10 +159,10 @@ class _ProfileTabState extends State<ProfileTab> {
                           decoration: BoxDecoration(
                             color: selected ? const Color(0xFF166864) : const Color(0xFF0D1825),
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: selected ? const Color(0xFF28D5CF) : const Color(0xFF26364A)),
+                            border: Border.all(color: selected ? _theme.primaryColor : const Color(0xFF26364A)),
                           ),
                           child: Center(
-                            child: Text(g, style: TextStyle(color: selected ? const Color(0xFF28D5CF) : Colors.white, fontWeight: FontWeight.bold)),
+                            child: Text(g, style: TextStyle(color: selected ? _theme.primaryColor : Colors.white, fontWeight: FontWeight.bold)),
                           ),
                         ),
                       ),
@@ -185,12 +185,12 @@ class _ProfileTabState extends State<ProfileTab> {
                       isExpanded: true,
                       dropdownColor: const Color(0xFF0D1825),
                       style: const TextStyle(color: Colors.white, fontSize: 13),
-                      items: [
-                        'Ülőmunka (kevés mozgás)',
-                        'Könnyű (1-3 edzés/hét)',
-                        'Mérsékelten aktív (3-5 edzés/hét)',
-                        'Nagyon aktív (6-7 edzés/hét)',
-                      ].map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),
+                      items: const [
+                        DropdownMenuItem(value: 'Ülőmunka (kevés mozgás)', child: Text('Ülőmunka (kevés mozgás)')),
+                        DropdownMenuItem(value: 'Könnyű (1-3 edzés/hét)', child: Text('Könnyű (1-3 edzés/hét)')),
+                        DropdownMenuItem(value: 'Mérsékelten aktív (3-5 edzés/hét)', child: Text('Mérsékelten aktív (3-5 edzés/hét)')),
+                        DropdownMenuItem(value: 'Nagyon aktív (6-7 edzés/hét)', child: Text('Nagyon aktív (6-7 edzés/hét)')),
+                      ],
                       onChanged: (val) {
                         if (val != null) setDialogState(() => tempActivity = val);
                       },
@@ -202,7 +202,7 @@ class _ProfileTabState extends State<ProfileTab> {
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF28D5CF),
+                      backgroundColor: _theme.primaryColor,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
@@ -242,154 +242,152 @@ class _ProfileTabState extends State<ProfileTab> {
         fillColor: const Color(0xFF0D1825),
         isDense: true,
         enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFF26364A))),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFF28D5CF))),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: _theme.primaryColor)),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return const Scaffold(backgroundColor: Color(0xFF07101B), body: Center(child: CircularProgressIndicator(color: Color(0xFF28D5CF))));
-    }
+    return AnimatedBuilder(
+      animation: _theme,
+      builder: (context, _) {
+        if (_isLoading) {
+          return Scaffold(backgroundColor: const Color(0xFF07101B), body: Center(child: CircularProgressIndicator(color: _theme.primaryColor)));
+        }
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF07101B),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF07101B),
-        elevation: 0,
-        title: const Text('Felhasználói Profil', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit, color: Color(0xFF28D5CF)),
-            onPressed: _showEditProfileDialog,
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Profil Fejléc Kártya
-            Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0D1825),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0xFF26364A)),
+        return Scaffold(
+          backgroundColor: const Color(0xFF07101B),
+          appBar: AppBar(
+            backgroundColor: const Color(0xFF07101B),
+            elevation: 0,
+            title: const Text('Felhasználói Profil', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
+            actions: [
+              IconButton(
+                icon: Icon(Icons.edit, color: _theme.primaryColor),
+                onPressed: _showEditProfileDialog,
               ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: const LinearGradient(colors: [Color(0xFF28D5CF), Color(0xFFFF356D)]),
-                    ),
-                    child: Center(
-                      child: Text(
-                        _username.isNotEmpty ? _username[0].toUpperCase() : 'P',
-                        style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: Color(0xFF07101B)),
-                      ),
-                    ),
+              const SizedBox(width: 8),
+            ],
+          ),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0D1825),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0xFF26364A)),
                   ),
-                  const SizedBox(width: 16),
-                  Column(
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(colors: [_theme.primaryColor, _theme.secondaryColor]),
+                        ),
+                        child: Center(
+                          child: Text(
+                            _username.isNotEmpty ? _username[0].toUpperCase() : 'P',
+                            style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: Color(0xFF07101B)),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(_username, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+                          const SizedBox(height: 2),
+                          Text(_userTag, style: TextStyle(color: _theme.primaryColor, fontSize: 12, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0D1825),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0xFF26364A)),
+                  ),
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(_username, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
-                      const SizedBox(height: 2),
-                      Text(_userTag, style: const TextStyle(color: Color(0xFF28D5CF), fontSize: 12, fontWeight: FontWeight.bold)),
+                      const Text('Számított Napi Kalóriaszükséglet (TDEE):', style: TextStyle(color: Color(0xFF91A2B5), fontSize: 12)),
+                      const SizedBox(height: 4),
+                      Text('$_calculatedTdee kcal / nap', style: TextStyle(color: _theme.primaryColor, fontSize: 24, fontWeight: FontWeight.w900)),
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildInfoCol('Súly', '$_currentWeight kg'),
+                          _buildInfoCol('Célsúly', '$_targetWeight kg'),
+                          _buildInfoCol('Magasság', '$_heightCm cm'),
+                          _buildInfoCol('Kor', '$_age év'),
+                        ],
+                      ),
                     ],
                   ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Napi Kalóriacél & TDEE kártya
-            Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0D1825),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0xFF26364A)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Számított Napi Kalóriaszükséglet (TDEE):', style: TextStyle(color: Color(0xFF91A2B5), fontSize: 12)),
-                  const SizedBox(height: 4),
-                  Text('$_calculatedTdee kcal / nap', style: const TextStyle(color: Color(0xFF28D5CF), fontSize: 24, fontWeight: FontWeight.w900)),
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                ),
+                const SizedBox(height: 24),
+                const Text('Adatvédelem & Megosztás Barátokkal', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 10),
+                Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0D1825),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: const Color(0xFF26364A)),
+                  ),
+                  child: Column(
                     children: [
-                      _buildInfoCol('Súly', '$_currentWeight kg'),
-                      _buildInfoCol('Célsúly', '$_targetWeight kg'),
-                      _buildInfoCol('Magasság', '$_heightCm cm'),
-                      _buildInfoCol('Kor', '$_age év'),
+                      SwitchListTile(
+                        activeThumbColor: _theme.primaryColor,
+                        title: const Text('Testsúly & Diagram megosztása', style: TextStyle(color: Colors.white, fontSize: 14)),
+                        subtitle: const Text('A barátaid láthatják a testsúlyod alakulását', style: TextStyle(color: Color(0xFF91A2B5), fontSize: 11)),
+                        value: _shareWeight,
+                        onChanged: (val) {
+                          setState(() => _shareWeight = val);
+                          _saveProfile();
+                        },
+                      ),
+                      const Divider(color: Color(0xFF1B2A3D), height: 1),
+                      SwitchListTile(
+                        activeThumbColor: _theme.primaryColor,
+                        title: const Text('Napi étkezések & Makrók láthatósága', style: TextStyle(color: Colors.white, fontSize: 14)),
+                        subtitle: const Text('A barátaid láthatják, mit ettél a mai napon', style: TextStyle(color: Color(0xFF91A2B5), fontSize: 11)),
+                        value: _shareMeals,
+                        onChanged: (val) {
+                          setState(() => _shareMeals = val);
+                          _saveProfile();
+                        },
+                      ),
+                      const Divider(color: Color(0xFF1B2A3D), height: 1),
+                      SwitchListTile(
+                        activeThumbColor: _theme.primaryColor,
+                        title: const Text('Edzéstervek & Használt súlyok', style: TextStyle(color: Colors.white, fontSize: 14)),
+                        subtitle: const Text('A barátaid láthatják az elvégzett szériáidat', style: TextStyle(color: Color(0xFF91A2B5), fontSize: 11)),
+                        value: _shareWorkouts,
+                        onChanged: (val) {
+                          setState(() => _shareWorkouts = val);
+                          _saveProfile();
+                        },
+                      ),
                     ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-
-            const SizedBox(height: 24),
-
-            // Adatvédelmi Beállítások a Barátlistához
-            const Text('Adatvédelem & Megosztás Barátokkal', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
-            Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFF0D1825),
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: const Color(0xFF26364A)),
-              ),
-              child: Column(
-                children: [
-                  SwitchListTile(
-                    activeColor: const Color(0xFF28D5CF),
-                    title: const Text('Testsúly & Diagram megosztása', style: TextStyle(color: Colors.white, fontSize: 14)),
-                    subtitle: const Text('A barátaid láthatják a testsúlyod alakulását', style: TextStyle(color: Color(0xFF91A2B5), fontSize: 11)),
-                    value: _shareWeight,
-                    onChanged: (val) {
-                      setState(() => _shareWeight = val);
-                      _saveProfile();
-                    },
-                  ),
-                  const Divider(color: Color(0xFF1B2A3D), height: 1),
-                  SwitchListTile(
-                    activeColor: const Color(0xFF28D5CF),
-                    title: const Text('Napi étkezések & Makrók láthatósága', style: TextStyle(color: Colors.white, fontSize: 14)),
-                    subtitle: const Text('A barátaid láthatják, mit ettél a mai napon', style: TextStyle(color: Color(0xFF91A2B5), fontSize: 11)),
-                    value: _shareMeals,
-                    onChanged: (val) {
-                      setState(() => _shareMeals = val);
-                      _saveProfile();
-                    },
-                  ),
-                  const Divider(color: Color(0xFF1B2A3D), height: 1),
-                  SwitchListTile(
-                    activeColor: const Color(0xFF28D5CF),
-                    title: const Text('Edzéstervek & Használt súlyok', style: TextStyle(color: Colors.white, fontSize: 14)),
-                    subtitle: const Text('A barátaid láthatják az elvégzett szériáidat', style: TextStyle(color: Color(0xFF91A2B5), fontSize: 11)),
-                    value: _shareWorkouts,
-                    onChanged: (val) {
-                      setState(() => _shareWorkouts = val);
-                      _saveProfile();
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
