@@ -1,4 +1,4 @@
-﻿name: Multiplatform Build (Android, iOS, Windows)
+﻿name: Mobile Release Build (Android & iOS)
 
 on:
   push:
@@ -20,8 +20,6 @@ jobs:
         with:
           channel: 'stable'
           cache: true
-      - name: Make Gradlew executable
-        run: chmod +x android/gradlew
       - name: Build Android APK
         run: |
           flutter pub get
@@ -41,41 +39,30 @@ jobs:
         with:
           channel: 'stable'
           cache: true
-      - name: Build iOS App without signing
+      - name: Build Unsigned iOS IPA
         run: |
           flutter pub get
-          flutter build ios --release --no-codesign
+          flutter build ios --release --config-only
+          cd ios
+          pod install
+          xcodebuild build \
+            -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath ../build/ios/DerivedData \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            PROVISIONING_PROFILE="" \
+            ONLY_ACTIVE_ARCH=NO
+          cd ..
+          mkdir -p build/ios/iphoneos/Payload
+          cp -r build/ios/DerivedData/Build/Products/Release-iphoneos/Runner.app build/ios/iphoneos/Payload/
           cd build/ios/iphoneos
-          mkdir -p Payload
-          cp -r Runner.app Payload/
           zip -r App.ipa Payload
-      - name: Upload iOS IPA
+      - name: Upload iOS Sideloadable IPA
         uses: actions/upload-artifact@v4
         with:
           name: iOS-IPA-Sideloadable
           path: build/ios/iphoneos/App.ipa
-
-  build-windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-          cache: true
-      - name: Enable Windows Desktop
-        run: flutter config --enable-windows-desktop
-      - name: Build Windows EXE
-        run: |
-          flutter pub get
-          flutter build windows --release
-      - name: Archive Windows Release
-        shell: pwsh
-        run: |
-          Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath Windows-App.zip
-      - name: Upload Windows EXE
-        uses: actions/upload-artifact@v4
-        with:
-          name: Windows-EXE
-          path: Windows-App.zip
