@@ -20,7 +20,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
       backgroundColor: theme.cardColor,
       isScrollControlled: true,
       builder: (ctx) => Padding(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom, left: 24, right: 24, top: 24, bottom: 24),
+        padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom + 24, left: 24, right: 24, top: 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,9 +91,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
           decoration: BoxDecoration(color: theme.cardColor, borderRadius: BorderRadius.circular(16)),
           child: LineChart(
             LineChartData(
-              gridData: FlGridData(show: false),
+              gridData: const FlGridData(show: false),
               titlesData: FlTitlesData(
-                leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 40, getTitlesWidget: (val, _) => Text('${val.toStringAsFixed(1)}', style: const TextStyle(color: Colors.white54, fontSize: 10)))),
+                leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 40, getTitlesWidget: (val, _) => Text(val.toStringAsFixed(1), style: const TextStyle(color: Colors.white54, fontSize: 10)))),
                 bottomTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
