@@ -5,6 +5,46 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/theme_service.dart';
 import 'workout_tracker_tab.dart';
 
+class WorkoutInvite {
+  final String id;
+  final String senderName;
+  final String targetFriendName;
+  final String workoutType;
+  final String timeLabel;
+  final DateTime createdAt;
+  String status;
+
+  WorkoutInvite({
+    required this.id,
+    required this.senderName,
+    required this.targetFriendName,
+    required this.workoutType,
+    required this.timeLabel,
+    required this.createdAt,
+    this.status = 'pending',
+  });
+
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'senderName': senderName,
+        'targetFriendName': targetFriendName,
+        'workoutType': workoutType,
+        'timeLabel': timeLabel,
+        'createdAt': createdAt.toIso8601String(),
+        'status': status,
+      };
+
+  factory WorkoutInvite.fromMap(Map<String, dynamic> map) => WorkoutInvite(
+        id: map['id'] ?? '',
+        senderName: map['senderName'] ?? 'Edzőtárs',
+        targetFriendName: map['targetFriendName'] ?? '',
+        workoutType: map['workoutType'] ?? 'Vegyes Edzés',
+        timeLabel: map['timeLabel'] ?? 'MOST',
+        createdAt: DateTime.tryParse(map['createdAt'] ?? '') ?? DateTime.now(),
+        status: map['status'] ?? 'pending',
+      );
+}
+
 class FriendsTab extends StatefulWidget {
   const FriendsTab({super.key});
 

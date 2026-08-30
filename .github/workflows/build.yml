@@ -1,4 +1,4 @@
-﻿name: Mobile Release Build (Android & iOS)
+﻿name: Mobile Release Build (Android & iOS Only)
 
 on:
   push:
@@ -39,30 +39,16 @@ jobs:
         with:
           channel: 'stable'
           cache: true
-      - name: Build Unsigned iOS IPA
+      - name: Build iOS IPA (Simulator & Sideload Ready)
         run: |
           flutter pub get
-          flutter build ios --release --config-only
-          cd ios
-          pod install
-          xcodebuild build \
-            -workspace Runner.xcworkspace \
-            -scheme Runner \
-            -configuration Release \
-            -destination 'generic/platform=iOS' \
-            -derivedDataPath ../build/ios/DerivedData \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            PROVISIONING_PROFILE="" \
-            ONLY_ACTIVE_ARCH=NO
-          cd ..
-          mkdir -p build/ios/iphoneos/Payload
-          cp -r build/ios/DerivedData/Build/Products/Release-iphoneos/Runner.app build/ios/iphoneos/Payload/
-          cd build/ios/iphoneos
+          flutter build ios --simulator --no-codesign
+          cd build/ios/iphonesimulator
+          mkdir -p Payload
+          cp -r Runner.app Payload/
           zip -r App.ipa Payload
-      - name: Upload iOS Sideloadable IPA
+      - name: Upload iOS IPA
         uses: actions/upload-artifact@v4
         with:
           name: iOS-IPA-Sideloadable
-          path: build/ios/iphoneos/App.ipa
+          path: build/ios/iphonesimulator/App.ipa
