@@ -1,9 +1,9 @@
 ﻿import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'recipes_screen.dart';
 import '../services/theme_service.dart';
 import '../models/recipe_model.dart';
+import 'recipes_screen.dart';
 
 class DashboardTab extends StatefulWidget {
   const DashboardTab({super.key});
@@ -17,17 +17,18 @@ class _DashboardTabState extends State<DashboardTab> {
 
   List<String> _cardOrder = [
     'summary',
+    'macro_chart',
     'workout',
     'water',
     'recipes',
     'weight',
   ];
 
-  bool _isReordering = false;
   String _todayWorkoutType = 'Nincs mára tervezett edzés';
   List<Map<String, dynamic>> _plannedExercises = [];
-  int _waterGlasses = 0;
+  int _waterGlasses = 4;
   double _currentWeight = 78.5;
+  double _targetWeight = 75.0;
 
   @override
   void initState() {
@@ -45,26 +46,19 @@ class _DashboardTabState extends State<DashboardTab> {
     _todayWorkoutType = prefs.getString('daily_workout_type') ?? 'Nincs mára tervezett edzés';
     final rawExercises = prefs.getString('daily_planned_exercises');
     if (rawExercises != null && rawExercises.isNotEmpty) {
-      final List<dynamic> decoded = jsonDecode(rawExercises);
-      _plannedExercises = decoded.map((e) => Map<String, dynamic>.from(e)).toList();
+      _plannedExercises = List<Map<String, dynamic>>.from(jsonDecode(rawExercises));
     }
 
     _waterGlasses = prefs.getInt('daily_water_glasses') ?? 4;
     _currentWeight = prefs.getDouble('user_current_weight') ?? 78.5;
+    _targetWeight = prefs.getDouble('user_target_weight') ?? 75.0;
 
     setState(() {});
   }
 
-  Future<void> _saveCardOrder() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList('dashboard_card_order', _cardOrder);
-  }
-
   Future<void> _updateWater(int delta) async {
     final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _waterGlasses = (_waterGlasses + delta).clamp(0, 20);
-    });
+    setState(() => _waterGlasses = (_waterGlasses + delta).clamp(0, 20));
     await prefs.setInt('daily_water_glasses', _waterGlasses);
   }
 
@@ -97,113 +91,23 @@ class _DashboardTabState extends State<DashboardTab> {
                 ],
               ),
             ),
-            actions: [
-              IconButton(
-                icon: Icon(
-                  _isReordering ? Icons.check_circle_rounded : Icons.tune_rounded,
-                  color: _isReordering ? _theme.primaryColor : const Color(0xFF91A2B5),
-                ),
-                tooltip: _isReordering ? 'Kész' : 'Kártyák átrendezése',
-                onPressed: () {
-                  setState(() {
-                    _isReordering = !_isReordering;
-                  });
-                  if (!_isReordering) {
-                    _saveCardOrder();
-                  }
-                },
-              ),
-            ],
           ),
-          body: _isReordering ? _buildReorderableList() : _buildNormalDashboard(),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: _cardOrder.map((key) => _buildCardByKey(key)).toList(),
+            ),
+          ),
         );
       },
     );
   }
 
-  Widget _buildNormalDashboard() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: _cardOrder.map((key) => _buildCardByKey(key)).toList(),
-      ),
-    );
-  }
-
-  Widget _buildReorderableList() {
-    return Column(
-      children: [
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(12),
-          color: _theme.cardColor,
-          child: const Text(
-            'Húzd a kártyákat a kívánt sorrendbe!',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold),
-          ),
-        ),
-        Expanded(
-          child: ReorderableListView(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            onReorder: (oldIndex, newIndex) {
-              setState(() {
-                if (oldIndex < newIndex) {
-                  newIndex -= 1;
-                }
-                final item = _cardOrder.removeAt(oldIndex);
-                _cardOrder.insert(newIndex, item);
-              });
-              _saveCardOrder();
-            },
-            children: _cardOrder.map((key) {
-              return Container(
-                key: ValueKey(key),
-                margin: const EdgeInsets.only(bottom: 10),
-                decoration: BoxDecoration(
-                  color: _theme.cardColor,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: _theme.primaryColor.withValues(alpha: 0.4)),
-                ),
-                child: ListTile(
-                  leading: Icon(_getCardIcon(key), color: _theme.primaryColor),
-                  title: Text(_getCardTitle(key), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  trailing: const Icon(Icons.drag_handle_rounded, color: Colors.white54),
-                ),
-              );
-            }).toList(),
-          ),
-        ),
-      ],
-    );
-  }
-
-  IconData _getCardIcon(String key) {
-    switch (key) {
-      case 'summary': return Icons.bolt_rounded;
-      case 'workout': return Icons.fitness_center_rounded;
-      case 'water': return Icons.water_drop_rounded;
-      case 'recipes': return Icons.restaurant_menu_rounded;
-      case 'weight': return Icons.monitor_weight_rounded;
-      default: return Icons.dashboard_rounded;
-    }
-  }
-
-  String _getCardTitle(String key) {
-    switch (key) {
-      case 'summary': return 'Napi Állapot & Makrók';
-      case 'workout': return 'Napi Edzés (Lenyitható)';
-      case 'water': return 'Vízfogyasztás Követő';
-      case 'recipes': return 'Fitnesz Receptajánló';
-      case 'weight': return 'Testsúly & Formakövetés';
-      default: return 'Modul';
-    }
-  }
-
   Widget _buildCardByKey(String key) {
     switch (key) {
       case 'summary': return _buildSummaryCard();
+      case 'macro_chart': return _buildMacroChartCard();
       case 'workout': return _buildWorkoutCard();
       case 'water': return _buildWaterCard();
       case 'recipes': return _buildRecipesCard();
@@ -216,18 +120,14 @@ class _DashboardTabState extends State<DashboardTab> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: _theme.cardColor,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFF1F2F42)),
-      ),
+      decoration: BoxDecoration(color: _theme.cardColor, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0xFF1F2F42))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('NAPI CÉLOK', style: TextStyle(color: _theme.primaryColor, fontWeight: FontWeight.w900, fontSize: 12, letterSpacing: 0.8)),
+              Text('NAPI CÉLOK', style: TextStyle(color: _theme.primaryColor, fontWeight: FontWeight.w900, fontSize: 12)),
               Text('2,450 kcal', style: TextStyle(color: _theme.secondaryColor, fontWeight: FontWeight.bold, fontSize: 13)),
             ],
           ),
@@ -255,14 +155,66 @@ class _DashboardTabState extends State<DashboardTab> {
         const SizedBox(height: 4),
         SizedBox(
           width: 85,
-          child: LinearProgressIndicator(
-            value: progress,
-            backgroundColor: const Color(0xFF1F2F42),
-            color: color,
-            minHeight: 4,
-            borderRadius: BorderRadius.circular(2),
-          ),
+          child: LinearProgressIndicator(value: progress, backgroundColor: const Color(0xFF1F2F42), color: color, minHeight: 4),
         ),
+      ],
+    );
+  }
+
+  Widget _buildMacroChartCard() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(color: _theme.cardColor, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0xFF1F2F42))),
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          initiallyExpanded: false,
+          leading: Icon(Icons.pie_chart_rounded, color: _theme.secondaryColor),
+          title: const Text('Makró Eloszlás & Kalória Diagram', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+          subtitle: const Text('Kattints a részletes kördiagramhoz', style: TextStyle(color: Color(0xFF91A2B5), fontSize: 12)),
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _legendDot('Fehérje (45%)', _theme.primaryColor),
+                      _legendDot('Szénhidrát (40%)', _theme.secondaryColor),
+                      _legendDot('Zsír (15%)', const Color(0xFFFFB300)),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    height: 14,
+                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(7)),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(7),
+                      child: Row(
+                        children: [
+                          Expanded(flex: 45, child: Container(color: _theme.primaryColor)),
+                          Expanded(flex: 40, child: Container(color: _theme.secondaryColor)),
+                          Expanded(flex: 15, child: Container(color: const Color(0xFFFFB300))),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _legendDot(String text, Color color) {
+    return Row(
+      children: [
+        Container(width: 10, height: 10, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        const SizedBox(width: 6),
+        Text(text, style: const TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold)),
       ],
     );
   }
@@ -270,27 +222,18 @@ class _DashboardTabState extends State<DashboardTab> {
   Widget _buildWorkoutCard() {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: _theme.cardColor,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFF1F2F42)),
-      ),
+      decoration: BoxDecoration(color: _theme.cardColor, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0xFF1F2F42))),
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
           initiallyExpanded: false,
           leading: Icon(Icons.fitness_center_rounded, color: _theme.primaryColor),
           title: Text(_todayWorkoutType, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-          subtitle: Text('${_plannedExercises.length} betárazott gyakorlat', style: const TextStyle(color: Color(0xFF91A2B5), fontSize: 12)),
+          subtitle: Text('${_plannedExercises.length} gyakorlat', style: const TextStyle(color: Color(0xFF91A2B5), fontSize: 12)),
           children: [
-            if (_plannedExercises.isEmpty)
-              const Padding(
-                padding: EdgeInsets.only(bottom: 16),
-                child: Text('Nincs aktív gyakorlat kiválasztva.', style: TextStyle(color: Color(0xFF91A2B5), fontSize: 12)),
-              )
-            else
+            if (_plannedExercises.isNotEmpty)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   children: _plannedExercises.asMap().entries.map((entry) {
                     final idx = entry.key;
@@ -300,34 +243,17 @@ class _DashboardTabState extends State<DashboardTab> {
                     return Container(
                       margin: const EdgeInsets.only(bottom: 8),
                       padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: _theme.backgroundColor,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+                      decoration: BoxDecoration(color: _theme.backgroundColor, borderRadius: BorderRadius.circular(10)),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(ex['name'] ?? '', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-                                Text('$target széria × ${ex['targetReps'] ?? 10} ismétlés', style: const TextStyle(color: Color(0xFF91A2B5), fontSize: 11)),
-                              ],
-                            ),
-                          ),
+                          Expanded(child: Text(ex['name'] ?? '', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13))),
                           InkWell(
                             onTap: () => _toggleExerciseSet(idx),
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: completed >= target ? _theme.primaryColor : const Color(0xFF1F2F42),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                '$completed / $target',
-                                style: TextStyle(color: completed >= target ? const Color(0xFF07101B) : Colors.white, fontWeight: FontWeight.w900, fontSize: 12),
-                              ),
+                              decoration: BoxDecoration(color: completed >= target ? _theme.primaryColor : const Color(0xFF1F2F42), borderRadius: BorderRadius.circular(8)),
+                              child: Text('$completed / $target', style: TextStyle(color: completed >= target ? const Color(0xFF07101B) : Colors.white, fontWeight: FontWeight.w900)),
                             ),
                           ),
                         ],
@@ -346,11 +272,7 @@ class _DashboardTabState extends State<DashboardTab> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: _theme.cardColor,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFF1F2F42)),
-      ),
+      decoration: BoxDecoration(color: _theme.cardColor, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0xFF1F2F42))),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -369,14 +291,8 @@ class _DashboardTabState extends State<DashboardTab> {
           ),
           Row(
             children: [
-              IconButton(
-                icon: const Icon(Icons.remove_circle_outline_rounded, color: Colors.white70),
-                onPressed: () => _updateWater(-1),
-              ),
-              IconButton(
-                icon: Icon(Icons.add_circle_rounded, color: _theme.primaryColor),
-                onPressed: () => _updateWater(1),
-              ),
+              IconButton(icon: const Icon(Icons.remove_circle_outline_rounded, color: Colors.white70), onPressed: () => _updateWater(-1)),
+              IconButton(icon: Icon(Icons.add_circle_rounded, color: _theme.primaryColor), onPressed: () => _updateWater(1)),
             ],
           ),
         ],
@@ -385,43 +301,28 @@ class _DashboardTabState extends State<DashboardTab> {
   }
 
   Widget _buildRecipesCard() {
-    final sampleRecipe = kBuiltInRecipes.first;
+    final sampleRecipe = kLidlExcelRecipes.first;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: _theme.cardColor,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFF1F2F42)),
-      ),
+      decoration: BoxDecoration(color: _theme.cardColor, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0xFF1F2F42))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('AJÁNLOTT RECEPT', style: TextStyle(color: _theme.secondaryColor, fontWeight: FontWeight.w900, fontSize: 11, letterSpacing: 0.8)),
+              Text('LIDL RECEPTAJÁNLÓ', style: TextStyle(color: _theme.secondaryColor, fontWeight: FontWeight.w900, fontSize: 11)),
               InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (ctx) => const RecipesScreen()),
-                  );
-                },
-                child: Row(
-                  children: [
-                    Text('ÖSSZES RECEPT', style: TextStyle(color: _theme.primaryColor, fontWeight: FontWeight.w900, fontSize: 11)),
-                    const SizedBox(width: 4),
-                    Icon(Icons.arrow_forward_rounded, color: _theme.primaryColor, size: 14),
-                  ],
-                ),
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (ctx) => const RecipesScreen())),
+                child: Text('ÖSSZES RECEPT', style: TextStyle(color: _theme.primaryColor, fontWeight: FontWeight.w900, fontSize: 11)),
               ),
             ],
           ),
           const SizedBox(height: 8),
           Text(sampleRecipe.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
           const SizedBox(height: 4),
-          Text('Elkészítés: ${sampleRecipe.prepTime} • ${sampleRecipe.protein}g Fehérje • ${sampleRecipe.calories} kcal', style: const TextStyle(color: Color(0xFF91A2B5), fontSize: 12)),
+          Text('${sampleRecipe.prepTime} • ${sampleRecipe.protein}g Fehérje • ${sampleRecipe.calories} kcal', style: const TextStyle(color: Color(0xFF91A2B5), fontSize: 12)),
         ],
       ),
     );
@@ -431,11 +332,7 @@ class _DashboardTabState extends State<DashboardTab> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: _theme.cardColor,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFF1F2F42)),
-      ),
+      decoration: BoxDecoration(color: _theme.cardColor, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0xFF1F2F42))),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -447,7 +344,7 @@ class _DashboardTabState extends State<DashboardTab> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text('Aktuális Súly', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-                  Text('$_currentWeight kg (Cél: 75.0 kg)', style: const TextStyle(color: Color(0xFF91A2B5), fontSize: 12)),
+                  Text('$_currentWeight kg (Cél: $_targetWeight kg)', style: const TextStyle(color: Color(0xFF91A2B5), fontSize: 12)),
                 ],
               ),
             ],
