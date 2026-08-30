@@ -1,11 +1,20 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'screens/main_layout.dart';
 import 'services/theme_service.dart';
+import 'providers/app_state.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await ThemeService().init();
-  runApp(const DagiApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AppState()),
+      ],
+      child: const DagiApp(),
+    ),
+  );
 }
 
 class DagiApp extends StatelessWidget {

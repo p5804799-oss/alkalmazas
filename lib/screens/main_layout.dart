@@ -1,5 +1,10 @@
 ﻿import 'package:flutter/material.dart';
 import 'dashboard_screen.dart';
+import 'workout_screen.dart';
+import 'food_recipe_screen.dart';
+import 'progress_screen.dart';
+import 'profile_screen.dart';
+import 'community_screen.dart';
 import 'dev_designer_sheet.dart';
 import '../services/theme_service.dart';
 
@@ -17,11 +22,11 @@ class _MainLayoutState extends State<MainLayout> {
 
   final List<Widget> _screens = [
     const DashboardScreen(),
-    const Center(child: Text('Edzés Fül (Készül)', style: TextStyle(color: Colors.white))),
-    const Center(child: Text('Ételek & Receptek', style: TextStyle(color: Colors.white))),
-    const Center(child: Text('Fejlődés & Testsúly', style: TextStyle(color: Colors.white))),
-    const Center(child: Text('Közösség (Barátok)', style: TextStyle(color: Colors.white))),
-    const Center(child: Text('Profil & Célok', style: TextStyle(color: Colors.white))),
+    const WorkoutScreen(),
+    const FoodRecipeScreen(),
+    const ProgressScreen(),
+    const CommunityScreen(),
+    const ProfileScreen(),
   ];
 
   void _handleSecretTap() {
@@ -36,11 +41,7 @@ class _MainLayoutState extends State<MainLayout> {
     if (_secretTapCount >= 5) {
       _secretTapCount = 0;
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('🕵️ Fejlesztői Mód Aktiválva!')));
-      showModalBottomSheet(
-        context: context,
-        backgroundColor: Colors.transparent,
-        builder: (ctx) => const DevDesignerSheet(),
-      );
+      showModalBottomSheet(context: context, backgroundColor: Colors.transparent, builder: (ctx) => const DevDesignerSheet());
     }
   }
 
