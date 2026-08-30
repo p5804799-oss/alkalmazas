@@ -65,17 +65,18 @@ const List<ThemePreset> kAppThemePresets = [
 class ThemeService extends ChangeNotifier {
   static final ThemeService _instance = ThemeService._internal();
   factory ThemeService() => _instance;
-  ThemeService._internal() {
-    _loadTheme();
-  }
+  ThemeService._internal();
+
+  static List<ThemePreset> get presets => kAppThemePresets;
 
   String _currentThemeId = 'cyberpunk_cyan';
 
+  String get activePresetId => _currentThemeId;
+  String get currentThemeId => _currentThemeId;
   Color get primaryColor => _findTheme(_currentThemeId).primary;
   Color get secondaryColor => _findTheme(_currentThemeId).secondary;
   Color get backgroundColor => _findTheme(_currentThemeId).background;
   Color get cardColor => _findTheme(_currentThemeId).card;
-  String get currentThemeId => _currentThemeId;
 
   ThemePreset _findTheme(String id) {
     return kAppThemePresets.firstWhere(
@@ -84,10 +85,14 @@ class ThemeService extends ChangeNotifier {
     );
   }
 
-  Future<void> _loadTheme() async {
+  Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
     _currentThemeId = prefs.getString('app_theme_id') ?? 'cyberpunk_cyan';
     notifyListeners();
+  }
+
+  Future<void> setPreset(ThemePreset preset) async {
+    await setTheme(preset.id);
   }
 
   Future<void> setTheme(String id) async {
