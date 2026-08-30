@@ -20,6 +20,7 @@ class WorkoutCategory {
   final String title;
   final String subtitle;
   final String iconBadge;
+  final String imageUrl;
   final List<RoutineExercise> exercises;
 
   const WorkoutCategory({
@@ -27,6 +28,7 @@ class WorkoutCategory {
     required this.title,
     required this.subtitle,
     required this.iconBadge,
+    required this.imageUrl,
     required this.exercises,
   });
 }
@@ -37,6 +39,7 @@ const List<WorkoutCategory> kWorkoutCategories = [
     title: 'PUSH',
     subtitle: 'Mell • Váll • Tricepsz',
     iconBadge: '↗',
+    imageUrl: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=800&q=80',
     exercises: [
       RoutineExercise(name: 'Fekvenyomás rúddal', defaultSets: 4, defaultReps: 8),
       RoutineExercise(name: 'Döntött padú kézisúlyzós nyomás', defaultSets: 4, defaultReps: 10),
@@ -53,6 +56,7 @@ const List<WorkoutCategory> kWorkoutCategories = [
     title: 'PULL',
     subtitle: 'Hát • Trapéz • Bicepsz',
     iconBadge: '↙',
+    imageUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80',
     exercises: [
       RoutineExercise(name: 'Húzódzkodás / Széles lehúzás', defaultSets: 4, defaultReps: 8),
       RoutineExercise(name: 'Döntött törzsű evezés', defaultSets: 4, defaultReps: 8),
@@ -69,6 +73,7 @@ const List<WorkoutCategory> kWorkoutCategories = [
     title: 'LEG',
     subtitle: 'Comb • Vádli • Has',
     iconBadge: '⚡',
+    imageUrl: 'https://images.unsplash.com/photo-1434757436912-79ed740e7003?w=800&q=80',
     exercises: [
       RoutineExercise(name: 'Guggolás rúddal', defaultSets: 4, defaultReps: 8),
       RoutineExercise(name: 'Lábtoló gép', defaultSets: 4, defaultReps: 10),
@@ -84,6 +89,7 @@ const List<WorkoutCategory> kWorkoutCategories = [
     title: 'UPPER',
     subtitle: 'PUSH + PULL bankból • 1 terv',
     iconBadge: '◆',
+    imageUrl: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=800&q=80',
     exercises: [
       RoutineExercise(name: 'Fekvenyomás rúddal', defaultSets: 3, defaultReps: 8),
       RoutineExercise(name: 'Döntött törzsű evezés', defaultSets: 3, defaultReps: 8),
@@ -98,6 +104,7 @@ const List<WorkoutCategory> kWorkoutCategories = [
     title: 'LOWER',
     subtitle: 'Alsótest & Törzserő • 1 terv',
     iconBadge: '▼',
+    imageUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=800&q=80',
     exercises: [
       RoutineExercise(name: 'Guggolás rúddal', defaultSets: 4, defaultReps: 8),
       RoutineExercise(name: 'Román felhúzás', defaultSets: 4, defaultReps: 10),
@@ -162,18 +169,18 @@ class _WorkoutTrackerTabState extends State<WorkoutTrackerTab> {
   Widget _buildWorkoutCard(BuildContext context, WorkoutCategory cat) {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
-      height: 120,
+      height: 125,
       decoration: BoxDecoration(
         color: const Color(0xFF0D1825),
         borderRadius: BorderRadius.circular(22),
         border: Border.all(color: const Color(0xFF1F2F42), width: 1.5),
-        gradient: LinearGradient(
-          colors: [
-            const Color(0xFF142233),
-            const Color(0xFF0A121D).withValues(alpha: 0.9),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+        image: DecorationImage(
+          image: NetworkImage(cat.imageUrl),
+          fit: BoxFit.cover,
+          colorFilter: ColorFilter.mode(
+            const Color(0xFF07101B).withValues(alpha: 0.72),
+            BlendMode.darken,
+          ),
         ),
       ),
       child: Material(
@@ -204,15 +211,18 @@ class _WorkoutTrackerTabState extends State<WorkoutTrackerTab> {
                         fontSize: 32,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.2,
+                        shadows: [
+                          Shadow(color: Colors.black, blurRadius: 10, offset: Offset(0, 2)),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       '${cat.exercises.length} gyakorlat • ${cat.subtitle}',
                       style: const TextStyle(
-                        color: Color(0xFF91A2B5),
+                        color: Color(0xFFD3E0EA),
                         fontSize: 12,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],

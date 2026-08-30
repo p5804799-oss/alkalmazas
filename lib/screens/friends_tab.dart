@@ -1,6 +1,28 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import '../models/models.dart';
+﻿import 'package:flutter/material.dart';
+
+class FriendUser {
+  final String id;
+  final String name;
+  final String tag;
+  final String currentWorkout;
+  final int todayCalories;
+  final double currentWeight;
+  final List<double> weightProgress;
+  final bool shareWeight;
+  final bool shareMeals;
+
+  FriendUser({
+    required this.id,
+    required this.name,
+    required this.tag,
+    required this.currentWorkout,
+    required this.todayCalories,
+    required this.currentWeight,
+    required this.weightProgress,
+    this.shareWeight = true,
+    this.shareMeals = true,
+  });
+}
 
 class FriendsTab extends StatefulWidget {
   const FriendsTab({super.key});
@@ -10,308 +32,223 @@ class FriendsTab extends StatefulWidget {
 }
 
 class _FriendsTabState extends State<FriendsTab> {
-  final String _myInviteCode = 'FUTY-PETI-9842';
-
-  final List<FriendProfile> _friends = [
-    FriendProfile(
-      id: '1',
-      inviteCode: 'FUTY-Imre-1102',
-      name: 'Füty Imre',
-      avatar: 'KB',
-      currentWeight: 84.2,
-      weightChange: -1.6,
-      lastWeighInDate: 'Ma reggel',
-      todayKcal: 1840,
-      targetKcal: 2200,
-      todayProtein: 165,
-      targetProtein: 190,
-      todayWorkout: 'Push day 💪',
-      todayMeals: [
-        LoggedMeal(
-          id: 'm1',
-          date: '2026-08-29',
-          mealType: 'Reggeli',
-          name: 'Sonkás-cottage rántotta toasttal',
-          amount: 1,
-          unit: 'adag',
-          kcal: 625,
-          protein: 67.2,
-          carbs: 43.8,
-          fat: 18.4,
-        ),
-      ],
+  final List<FriendUser> _friends = [
+    FriendUser(
+      id: 'f1',
+      name: 'Balázs',
+      tag: '#BALAZS_9912',
+      currentWorkout: 'PUSH (Mell-Váll-Tri)',
+      todayCalories: 2340,
+      currentWeight: 82.5,
+      weightProgress: [84.0, 83.5, 83.1, 82.8, 82.5],
+      shareWeight: true,
+      shareMeals: true,
     ),
-    FriendProfile(
-      id: '2',
-      inviteCode: 'FUTY-KAL-3391',
-      name: 'Kala Pál',
-      avatar: 'NZS',
-      currentWeight: 67.1,
-      weightChange: -0.9,
-      lastWeighInDate: 'Tegnap',
-      todayKcal: 1420,
-      targetKcal: 1650,
-      todayProtein: 125,
-      targetProtein: 135,
-      todayWorkout: 'Legs / Fenék 🔥',
-      todayMeals: [
-        LoggedMeal(
-          id: 'm2',
-          date: '2026-08-29',
-          mealType: 'Reggeli',
-          name: 'Áfonyás overnight oats protein krémmel',
-          amount: 1,
-          unit: 'adag',
-          kcal: 605,
-          protein: 60.6,
-          carbs: 70.9,
-          fat: 7.6,
-        ),
-      ],
+    FriendUser(
+      id: 'f2',
+      name: 'Gergő',
+      tag: '#GERGO_4411',
+      currentWorkout: 'PULL (Hát-Bi)',
+      todayCalories: 2600,
+      currentWeight: 78.0,
+      weightProgress: [76.0, 76.5, 77.0, 77.4, 78.0],
+      shareWeight: false,
+      shareMeals: true,
     ),
   ];
 
-  void _showAddFriendDialog() {
-    final codeCtrl = TextEditingController();
-    final nameCtrl = TextEditingController();
+  final List<String> _pendingRequests = ['#BENCE_1204'];
 
+  void _showAddFriendDialog() {
+    final tagCtrl = TextEditingController();
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF131B2E),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Ismerős összekapcsolása', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Írd be a barátod meghívó kódját, hogy láthasd a mérlegelését és a napi étkezéseit tápértékekkel:',
-              style: TextStyle(color: Colors.white70, fontSize: 13),
-            ),
-            const SizedBox(height: 14),
-            TextField(
-              controller: codeCtrl,
-              decoration: InputDecoration(
-                labelText: 'Meghívó kód (pl. FUTY-BALA-1102)',
-                filled: true,
-                fillColor: const Color(0xFF0B101B),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: nameCtrl,
-              decoration: InputDecoration(
-                labelText: 'Ismerős neve',
-                filled: true,
-                fillColor: const Color(0xFF0B101B),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-            ),
-          ],
+      builder: (ctx) => Dialog(
+        backgroundColor: const Color(0xFF07101B),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: Color(0xFF26364A)),
         ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Mégse', style: TextStyle(color: Colors.white54))),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF2E63)),
-            onPressed: () {
-              if (codeCtrl.text.isEmpty) return;
-              final name = nameCtrl.text.isNotEmpty ? nameCtrl.text : codeCtrl.text;
-              setState(() {
-                _friends.add(FriendProfile(
-                  id: DateTime.now().millisecondsSinceEpoch.toString(),
-                  inviteCode: codeCtrl.text,
-                  name: name,
-                  avatar: name.isNotEmpty ? name.substring(0, 1).toUpperCase() : 'U',
-                  currentWeight: 78.5,
-                  weightChange: -1.2,
-                  lastWeighInDate: 'Ma',
-                  todayKcal: 1750,
-                  targetKcal: 2100,
-                  todayProtein: 150,
-                  targetProtein: 180,
-                  todayWorkout: 'Full Body 🔥',
-                  todayMeals: [],
-                ));
-              });
-              Navigator.pop(ctx);
-            },
-            child: const Text('Hozzáadás', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Barát Felkérése',
+                style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: tagCtrl,
+                style: const TextStyle(color: Colors.white, fontSize: 14),
+                decoration: InputDecoration(
+                  hintText: 'Add meg a barátod Dagi Tag-jét (pl. #BENCE_1204)',
+                  hintStyle: const TextStyle(color: Color(0xFF55687D), fontSize: 12),
+                  filled: true,
+                  fillColor: const Color(0xFF0D1825),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: Color(0xFF26364A)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: Color(0xFF28D5CF)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF28D5CF),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  onPressed: () {
+                    final tag = tagCtrl.text.trim();
+                    if (tag.isNotEmpty) {
+                      Navigator.pop(ctx);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Felkérés elküldve a következőnek: $tag!'),
+                          backgroundColor: const Color(0xFF28D5CF),
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text(
+                    'FELKÉRÉS KÜLDÉSE',
+                    style: TextStyle(color: Color(0xFF07101B), fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
-  void _showFriendDetailModal(FriendProfile friend) {
+  void _showCompareDialog(FriendUser friend) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF131B2E),
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (ctx) => DraggableScrollableSheet(
-        initialChildSize: 0.85,
-        maxChildSize: 0.95,
-        minChildSize: 0.5,
-        expand: false,
-        builder: (context, scrollController) => SingleChildScrollView(
-          controller: scrollController,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: 16),
-                  decoration: BoxDecoration(color: const Color(0xFF222F4C), borderRadius: BorderRadius.circular(2)),
+      backgroundColor: const Color(0xFF07101B),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Összehasonlítás: ${friend.name}',
+                  style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-              ),
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: 26,
-                    backgroundColor: const Color(0xFF00E5FF).withValues(alpha: 0.2),
-                    child: Text(friend.avatar, style: const TextStyle(color: Color(0xFF00E5FF), fontWeight: FontWeight.bold, fontSize: 18)),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
+                IconButton(
+                  icon: const Icon(Icons.close, color: Color(0xFF91A2B5)),
+                  onPressed: () => Navigator.pop(ctx),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0D1825),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: const Color(0xFF26364A)),
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(friend.name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
-                        Text('Edzés: ${friend.todayWorkout}', style: const TextStyle(color: Color(0xFFFF2E63), fontSize: 13, fontWeight: FontWeight.w600)),
+                        const Text('Te', style: TextStyle(color: Color(0xFF28D5CF), fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 4),
+                        const Text('Súly: 85.0 kg', style: TextStyle(color: Colors.white, fontSize: 13)),
+                        const Text('Kaja: 2400 kcal', style: TextStyle(color: Color(0xFF91A2B5), fontSize: 12)),
                       ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0D1825),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: const Color(0xFF26364A)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(friend.name, style: const TextStyle(color: Color(0xFFFF356D), fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 4),
+                        Text(
+                          friend.shareWeight ? 'Súly: ${friend.currentWeight} kg' : 'Súly: 🔒 Rejtve',
+                          style: const TextStyle(color: Colors.white, fontSize: 13),
+                        ),
+                        Text(
+                          friend.shareMeals ? 'Kaja: ${friend.todayCalories} kcal' : 'Kaja: 🔒 Rejtve',
+                          style: const TextStyle(color: Color(0xFF91A2B5), fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 18),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0D1825),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFF26364A)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Összehasonlító Trend Vonal',
+                    style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Container(width: 12, height: 3, color: const Color(0xFF28D5CF)),
+                      const SizedBox(width: 4),
+                      const Text('Te', style: TextStyle(color: Color(0xFF91A2B5), fontSize: 11)),
+                      const SizedBox(width: 12),
+                      Container(width: 12, height: 3, color: const Color(0xFFFF356D)),
+                      const SizedBox(width: 4),
+                      Text(friend.name, style: const TextStyle(color: Color(0xFF91A2B5), fontSize: 11)),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    height: 100,
+                    width: double.infinity,
+                    child: CustomPaint(
+                      painter: FriendComparePainter(),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF0B101B),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFF1E2B48)),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Column(
-                      children: [
-                        const Text('AKTUÁLIS SÚLY', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white54)),
-                        const SizedBox(height: 4),
-                        Text('${friend.currentWeight} kg', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Colors.white)),
-                        Text(friend.lastWeighInDate, style: const TextStyle(fontSize: 11, color: Colors.white38)),
-                      ],
-                    ),
-                    Container(height: 35, width: 1, color: const Color(0xFF222F4C)),
-                    Column(
-                      children: [
-                        const Text('VÁLTOZÁS', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white54)),
-                        const SizedBox(height: 4),
-                        Text('${friend.weightChange > 0 ? "+" : ""}${friend.weightChange} kg',
-                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF00E5FF))),
-                        const Text('4 hetes cél', style: const TextStyle(fontSize: 11, color: Colors.white38)),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF0B101B),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFF1E2B48)),
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Kalória: ${friend.todayKcal.toInt()} / ${friend.targetKcal.toInt()} kcal',
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-                        Text('${(friend.todayKcal / friend.targetKcal * 100).toInt()}%',
-                            style: const TextStyle(color: Color(0xFFFF2E63), fontWeight: FontWeight.bold, fontSize: 13)),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: LinearProgressIndicator(
-                        value: (friend.todayKcal / friend.targetKcal).clamp(0.0, 1.0),
-                        backgroundColor: const Color(0xFF222F4C),
-                        valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFFF2E63)),
-                        minHeight: 6,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Fehérje: ${friend.todayProtein.toInt()} / ${friend.targetProtein.toInt()} g',
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-                        Text('${(friend.todayProtein / friend.targetProtein * 100).toInt()}%',
-                            style: const TextStyle(color: Color(0xFF00E5FF), fontWeight: FontWeight.bold, fontSize: 13)),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: LinearProgressIndicator(
-                        value: (friend.todayProtein / friend.targetProtein).clamp(0.0, 1.0),
-                        backgroundColor: const Color(0xFF222F4C),
-                        valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF00E5FF)),
-                        minHeight: 6,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Text('Mit evett ma részletesen?', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
-              const SizedBox(height: 12),
-              if (friend.todayMeals.isEmpty)
-                const Text('Még nincs rögzített étkezés.', style: TextStyle(color: Colors.white54))
-              else
-                ...friend.todayMeals.map((meal) => Container(
-                      margin: const EdgeInsets.only(bottom: 10),
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF0B101B),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: const Color(0xFF1E2B48)),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(meal.mealType, style: const TextStyle(color: Color(0xFFFF4D79), fontSize: 12, fontWeight: FontWeight.bold)),
-                              Text('${meal.amount.toInt()} ${meal.unit} • ${meal.kcal.toInt()} kcal',
-                                  style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600)),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Text(meal.name, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 6),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(color: const Color(0xFF131B2E), borderRadius: BorderRadius.circular(8)),
-                            child: Text(
-                              '🥩 P: ${meal.protein.toStringAsFixed(1)}g | 🍞 CH: ${meal.carbs.toStringAsFixed(1)}g | 🥑 Zs: ${meal.fat.toStringAsFixed(1)}g',
-                              style: const TextStyle(color: Colors.white60, fontSize: 11, fontWeight: FontWeight.w500),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )),
-            ],
-          ),
+            ),
+            const SizedBox(height: 16),
+          ],
         ),
       ),
     );
@@ -320,131 +257,148 @@ class _FriendsTabState extends State<FriendsTab> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF07101B),
       appBar: AppBar(
-        title: const Text('Csapat & Ismerősök', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: const Color(0xFF07101B),
+        elevation: 0,
+        title: const Text('Közösség & Barátok', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.person_add_alt_1, color: Color(0xFF00E5FF)),
+            icon: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0D1825),
+                border: Border.all(color: const Color(0xFF26364A)),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.person_add_alt_1_rounded, color: Color(0xFF28D5CF), size: 20),
+            ),
             onPressed: _showAddFriendDialog,
           ),
+          const SizedBox(width: 12),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: const Color(0xFF131B2E),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFF00E5FF).withValues(alpha: 0.3)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('A TE MEGHÍVÓ KÓDOD', style: TextStyle(color: Color(0xFF00E5FF), fontSize: 11, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(_myInviteCode, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Colors.white)),
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF00E5FF).withValues(alpha: 0.15),
-                        foregroundColor: const Color(0xFF00E5FF),
-                        elevation: 0,
-                      ),
-                      icon: const Icon(Icons.copy, size: 16),
-                      label: const Text('Másolás'),
-                      onPressed: () {
-                        Clipboard.setData(ClipboardData(text: _myInviteCode));
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('📋 Kód a vágólapra másolva!')),
-                        );
-                      },
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (_pendingRequests.isNotEmpty) ...[
+              const Text('Függőben lévő felkérések', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+              const SizedBox(height: 8),
+              ..._pendingRequests.map((tag) => Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0D1825),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: const Color(0xFF26364A)),
                     ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text('Közösségi állapot ma', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-              TextButton.icon(
-                icon: const Icon(Icons.add, size: 18, color: Color(0xFFFF2E63)),
-                label: const Text('Új Ismerős', style: TextStyle(color: Color(0xFFFF2E63))),
-                onPressed: _showAddFriendDialog,
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          ..._friends.map((friend) => Container(
-                margin: const EdgeInsets.only(bottom: 14),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF131B2E),
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: const Color(0xFF1E2B48)),
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(18),
-                    onTap: () => _showFriendDetailModal(friend),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 22,
-                                backgroundColor: const Color(0xFFFF2E63).withValues(alpha: 0.18),
-                                child: Text(friend.avatar, style: const TextStyle(color: Color(0xFFFF2E63), fontWeight: FontWeight.bold)),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(friend.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
-                                    Text('Edzés: ${friend.todayWorkout}', style: const TextStyle(color: Colors.white54, fontSize: 12)),
-                                  ],
-                                ),
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text('${friend.currentWeight} kg', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Colors.white)),
-                                  Text('${friend.weightChange > 0 ? "+" : ""}${friend.weightChange} kg',
-                                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF00E5FF))),
-                                ],
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                            decoration: BoxDecoration(color: const Color(0xFF0B101B), borderRadius: BorderRadius.circular(12)),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('🔥 ${friend.todayKcal.toInt()} kcal', style: const TextStyle(color: Color(0xFFFF2E63), fontSize: 12, fontWeight: FontWeight.bold)),
-                                Text('🥩 ${friend.todayProtein.toInt()} g P', style: const TextStyle(color: Color(0xFF00E5FF), fontSize: 12, fontWeight: FontWeight.bold)),
-                                const Icon(Icons.chevron_right, color: Colors.white38, size: 18),
-                              ],
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(tag, style: const TextStyle(color: Color(0xFF28D5CF), fontWeight: FontWeight.bold)),
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.check_circle, color: Color(0xFF28D5CF)),
+                              onPressed: () {
+                                setState(() => _pendingRequests.remove(tag));
+                              },
                             ),
+                            IconButton(
+                              icon: const Icon(Icons.cancel, color: Color(0xFFFF356D)),
+                              onPressed: () {
+                                setState(() => _pendingRequests.remove(tag));
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  )),
+              const SizedBox(height: 16),
+            ],
+            const Text('Barátaid', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+            const SizedBox(height: 10),
+            ..._friends.map((friend) => Container(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0D1825),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFF26364A)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: const Color(0xFF1B2A3D),
+                            child: Text(friend.name[0], style: const TextStyle(color: Color(0xFF28D5CF), fontWeight: FontWeight.bold)),
+                          ),
+                          const SizedBox(width: 12),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(friend.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+                              Text(friend.currentWorkout, style: const TextStyle(color: Color(0xFF91A2B5), fontSize: 11)),
+                            ],
                           ),
                         ],
                       ),
-                    ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF1B2A3D),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            side: const BorderSide(color: Color(0xFF28D5CF)),
+                          ),
+                        ),
+                        onPressed: () => _showCompareDialog(friend),
+                        child: const Text('Mérés ⚡', style: TextStyle(color: Color(0xFF28D5CF), fontSize: 11, fontWeight: FontWeight.bold)),
+                      ),
+                    ],
                   ),
-                ),
-              )),
-        ],
+                )),
+          ],
+        ),
       ),
     );
   }
+}
+
+class FriendComparePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p1 = Paint()
+      ..color = const Color(0xFF28D5CF)
+      ..strokeWidth = 3
+      ..style = PaintingStyle.stroke;
+
+    final p2 = Paint()
+      ..color = const Color(0xFFFF356D)
+      ..strokeWidth = 3
+      ..style = PaintingStyle.stroke;
+
+    final path1 = Path();
+    path1.moveTo(0, size.height * 0.7);
+    path1.lineTo(size.width * 0.3, size.height * 0.6);
+    path1.lineTo(size.width * 0.7, size.height * 0.4);
+    path1.lineTo(size.width, size.height * 0.2);
+
+    final path2 = Path();
+    path2.moveTo(0, size.height * 0.85);
+    path2.lineTo(size.width * 0.3, size.height * 0.75);
+    path2.lineTo(size.width * 0.7, size.height * 0.55);
+    path2.lineTo(size.width, size.height * 0.4);
+
+    canvas.drawPath(path1, p1);
+    canvas.drawPath(path2, p2);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

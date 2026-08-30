@@ -1,8 +1,11 @@
 ﻿import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/workout_presets.dart';
+import '../services/gemini_food_service.dart';
 import 'dev_designer_sheet.dart';
 import 'settings_dialog.dart';
 
@@ -29,22 +32,8 @@ const List<FoodTemplate> kCommonFoodDatabase = [
   FoodTemplate(name: 'Zabpehely (100g)', calories: 375, protein: 13.5, carbs: 60.0, fat: 7.0),
   FoodTemplate(name: 'Tejsavó fehérje (1 adag, 30g)', calories: 120, protein: 24.0, carbs: 2.0, fat: 1.5),
   FoodTemplate(name: 'Egész tojás (1 db L-es, ~60g)', calories: 85, protein: 7.5, carbs: 0.5, fat: 6.0),
-  FoodTemplate(name: 'Tojásfehérje (100g)', calories: 52, protein: 11.0, carbs: 0.7, fat: 0.2),
   FoodTemplate(name: 'Sovány túró (100g)', calories: 80, protein: 14.0, carbs: 3.8, fat: 0.5),
-  FoodTemplate(name: 'Görög joghurt 0% (100g)', calories: 58, protein: 10.0, carbs: 3.6, fat: 0.0),
   FoodTemplate(name: 'Tonhalkonzerv sós lében (100g)', calories: 110, protein: 25.5, carbs: 0.0, fat: 1.0),
-  FoodTemplate(name: 'Lazac filé (sült, 100g)', calories: 206, protein: 22.0, carbs: 0.0, fat: 13.0),
-  FoodTemplate(name: 'Marha darálthús sovány (100g)', calories: 215, protein: 26.0, carbs: 0.0, fat: 12.0),
-  FoodTemplate(name: 'Édesburgonya (sült, 100g)', calories: 90, protein: 2.0, carbs: 20.7, fat: 0.1),
-  FoodTemplate(name: 'Burgonya (főtt, 100g)', calories: 87, protein: 1.9, carbs: 20.1, fat: 0.1),
-  FoodTemplate(name: 'Brokkoli (párolt, 100g)', calories: 35, protein: 2.4, carbs: 7.0, fat: 0.4),
-  FoodTemplate(name: 'Banán (1 db közepes, ~120g)', calories: 105, protein: 1.3, carbs: 27.0, fat: 0.3),
-  FoodTemplate(name: 'Alma (1 db közepes, ~150g)', calories: 78, protein: 0.4, carbs: 21.0, fat: 0.3),
-  FoodTemplate(name: 'Mogyoróvaj (1 ek, ~20g)', calories: 120, protein: 5.0, carbs: 4.0, fat: 10.0),
-  FoodTemplate(name: 'Mandula (30g marék)', calories: 175, protein: 6.0, carbs: 6.0, fat: 15.0),
-  FoodTemplate(name: 'Teljes kiőrlésű kenyér (1 szelet, 40g)', calories: 95, protein: 4.0, carbs: 18.0, fat: 1.0),
-  FoodTemplate(name: 'Cottage cheese (100g)', calories: 98, protein: 11.0, carbs: 3.4, fat: 4.3),
-  FoodTemplate(name: 'Olívaolaj (1 ek, 10ml)', calories: 88, protein: 0.0, carbs: 0.0, fat: 10.0),
 ];
 
 class MealItem {
@@ -123,7 +112,7 @@ class DashboardTab extends StatefulWidget {
 }
 
 class _DashboardTabState extends State<DashboardTab> {
-  final int _targetCalories = 2400;
+  int _targetCalories = 2400;
   final double _targetProtein = 160.0;
   final double _targetCarbs = 250.0;
   final double _targetFat = 70.0;
@@ -146,6 +135,9 @@ class _DashboardTabState extends State<DashboardTab> {
   int _restSecondsRemaining = 0;
   bool _isRestTimerActive = false;
   int _devSecretClicks = 0;
+  bool _isAnalyzingPhoto = false;
+
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -173,6 +165,7 @@ class _DashboardTabState extends State<DashboardTab> {
 
   Future<void> _loadDashboardData() async {
     final prefs = await SharedPreferences.getInstance();
+    _targetCalories = prefs.getInt('daily_target_calories') ?? 2400;
     final String? mealData = prefs.getString('daily_meals_data');
     final String? exerciseData = prefs.getString('daily_planned_exercises');
     final String? savedWorkoutType = prefs.getString('daily_workout_type');
@@ -467,12 +460,12 @@ class _DashboardTabState extends State<DashboardTab> {
     );
   }
 
-  void _showAddMealDialog() {
-    final nameCtrl = TextEditingController();
-    final calCtrl = TextEditingController();
-    final pCtrl = TextEditingController();
-    final cCtrl = TextEditingController();
-    final fCtrl = TextEditingController();
+  void _showAddMealDialog({RecognizedFoodResult? initialAiData}) {
+    final nameCtrl = TextEditingController(text: initialAiData?.foodName ?? '');
+    final calCtrl = TextEditingController(text: initialAiData != null ? initialAiData.calories.toString() : '');
+    final pCtrl = TextEditingController(text: initialAiData != null ? initialAiData.protein.toString() : '');
+    final cCtrl = TextEditingController(text: initialAiData != null ? initialAiData.carbs.toString() : '');
+    final fCtrl = TextEditingController(text: initialAiData != null ? initialAiData.fat.toString() : '');
 
     showDialog(
       context: context,
@@ -488,108 +481,18 @@ class _DashboardTabState extends State<DashboardTab> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Étel Rögzítése & Gyorskereső',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-              const SizedBox(height: 14),
-              Autocomplete<FoodTemplate>(
-                displayStringForOption: (FoodTemplate option) => option.name,
-                optionsBuilder: (TextEditingValue textEditingValue) {
-                  if (textEditingValue.text.isEmpty) {
-                    return const Iterable<FoodTemplate>.empty();
-                  }
-                  return kCommonFoodDatabase.where((FoodTemplate option) {
-                    return option.name
-                        .toLowerCase()
-                        .contains(textEditingValue.text.toLowerCase());
-                  });
-                },
-                onSelected: (FoodTemplate selection) {
-                  nameCtrl.text = selection.name;
-                  calCtrl.text = selection.calories.toString();
-                  pCtrl.text = selection.protein.toString();
-                  cCtrl.text = selection.carbs.toString();
-                  fCtrl.text = selection.fat.toString();
-                },
-                fieldViewBuilder: (context, fieldTextEditingController, focusNode, onFieldSubmitted) {
-                  return TextField(
-                    controller: fieldTextEditingController,
-                    focusNode: focusNode,
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
-                    onChanged: (val) {
-                      nameCtrl.text = val;
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'Kezdj el gépelni (pl. Csirkemell, Rizs...)',
-                      hintStyle: const TextStyle(color: Color(0xFF55687D), fontSize: 13),
-                      prefixIcon: const Icon(Icons.search, color: Color(0xFF28D5CF), size: 20),
-                      filled: true,
-                      fillColor: const Color(0xFF0D1825),
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: Color(0xFF26364A)),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: Color(0xFF28D5CF)),
-                      ),
-                    ),
-                  );
-                },
-                optionsViewBuilder: (context, onSelected, options) {
-                  return Align(
-                    alignment: Alignment.topLeft,
-                    child: Material(
-                      elevation: 8,
-                      borderRadius: BorderRadius.circular(12),
-                      color: const Color(0xFF0D1825),
-                      child: Container(
-                        width: 280,
-                        constraints: const BoxConstraints(maxHeight: 180),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: const Color(0xFF26364A)),
-                        ),
-                        child: ListView.builder(
-                          padding: EdgeInsets.zero,
-                          shrinkWrap: true,
-                          itemCount: options.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            final FoodTemplate option = options.elementAt(index);
-                            return InkWell(
-                              onTap: () => onSelected(option),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                                decoration: BoxDecoration(
-                                  border: index < options.length - 1
-                                      ? const Border(bottom: BorderSide(color: Color(0xFF1B2A3D)))
-                                      : null,
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      option.name,
-                                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      '${option.calories} kcal | F: ${option.protein}g Sz: ${option.carbs}g Zs: ${option.fat}g',
-                                      style: const TextStyle(color: Color(0xFF28D5CF), fontSize: 11),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  );
-                },
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(initialAiData != null ? 'AI Felismerés - Ellenőrzés' : 'Étel Rögzítése',
+                      style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.white)),
+                  if (initialAiData != null)
+                    const Icon(Icons.auto_awesome, color: Color(0xFF28D5CF), size: 20),
+                ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
+              _buildInputField(nameCtrl, 'Étel neve (pl. Csirkemell rizzsel)'),
+              const SizedBox(height: 10),
               _buildInputField(calCtrl, 'Kalória (kcal)', isNumber: true),
               const SizedBox(height: 10),
               Row(
@@ -601,6 +504,13 @@ class _DashboardTabState extends State<DashboardTab> {
                   Expanded(child: _buildInputField(fCtrl, 'Zsír (g)', isNumber: true)),
                 ],
               ),
+              if (initialAiData != null && initialAiData.notes.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                Text(
+                  initialAiData.notes,
+                  style: const TextStyle(color: Color(0xFF28D5CF), fontSize: 11, fontStyle: FontStyle.italic),
+                ),
+              ],
               const SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
@@ -635,12 +545,77 @@ class _DashboardTabState extends State<DashboardTab> {
                     _saveDashboardData();
                     Navigator.of(ctx, rootNavigator: true).pop();
                   },
-                  child: const Text('MENTÉS',
+                  child: const Text('MENTÉS NAPI ÉTKEZÉSHEZ',
                       style: TextStyle(color: Color(0xFF07101B), fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _pickAndAnalyzeFoodImage(ImageSource source) async {
+    try {
+      final XFile? picked = await _picker.pickImage(
+        source: source,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 80,
+      );
+
+      if (picked == null) return;
+
+      setState(() => _isAnalyzingPhoto = true);
+
+      final result = await GeminiFoodService.analyzeFoodImage(File(picked.path));
+
+      setState(() => _isAnalyzingPhoto = false);
+
+      _showAddMealDialog(initialAiData: result);
+    } catch (e) {
+      setState(() => _isAnalyzingPhoto = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Hiba a kép beolvasásakor: $e'), backgroundColor: const Color(0xFFFF356D)),
+      );
+    }
+  }
+
+  void _showImageSourcePicker() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF07101B),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'AI Étel Fotózás & Felismerés ✨',
+              style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 18),
+            ListTile(
+              leading: const Icon(Icons.camera_alt_rounded, color: Color(0xFF28D5CF)),
+              title: const Text('Fotó készítése kamerával', style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(ctx);
+                _pickAndAnalyzeFoodImage(ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_rounded, color: Color(0xFFFF356D)),
+              title: const Text('Kép kiválasztása galériából', style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(ctx);
+                _pickAndAnalyzeFoodImage(ImageSource.gallery);
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -713,6 +688,32 @@ class _DashboardTabState extends State<DashboardTab> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (_isAnalyzingPhoto)
+              Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0D1825),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFF28D5CF)),
+                ),
+                child: const Row(
+                  children: [
+                    CircularProgressIndicator(color: Color(0xFF28D5CF)),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('AI Ételfelismerés folyamatban...', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                          Text('Makrók és kalória kiszámítása a fotó alapján', style: TextStyle(color: Color(0xFF91A2B5), fontSize: 11)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
             if (_isRestTimerActive)
               Container(
                 margin: const EdgeInsets.only(bottom: 16),
@@ -951,14 +952,32 @@ class _DashboardTabState extends State<DashboardTab> {
 
             const SizedBox(height: 24),
 
+            // Napi Ételek Szekció AI Fotó gombbal
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text('Mai Étkezések',
                     style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold)),
-                IconButton(
-                  icon: const Icon(Icons.add_circle, color: Color(0xFF28D5CF), size: 28),
-                  onPressed: _showAddMealDialog,
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1B2A3D),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: const Color(0xFF28D5CF)),
+                        ),
+                        child: const Icon(Icons.camera_alt_rounded, color: Color(0xFF28D5CF), size: 18),
+                      ),
+                      onPressed: _showImageSourcePicker,
+                    ),
+                    const SizedBox(width: 4),
+                    IconButton(
+                      icon: const Icon(Icons.add_circle, color: Color(0xFF28D5CF), size: 28),
+                      onPressed: () => _showAddMealDialog(),
+                    ),
+                  ],
                 ),
               ],
             ),

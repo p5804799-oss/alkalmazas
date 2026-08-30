@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'dashboard_tab.dart';
 import 'activity_tracker_tab.dart';
 import 'workout_tracker_tab.dart';
@@ -6,6 +6,7 @@ import 'trend_tab.dart';
 import 'foods_tab.dart';
 import 'recipes_tab.dart';
 import 'friends_tab.dart';
+import 'profile_tab.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -25,6 +26,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     FoodsTab(),
     RecipesTab(),
     FriendsTab(),
+    ProfileTab(),
   ];
 
   void _onTabChanged(int index) {
@@ -61,7 +63,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.fitness_center_rounded),
-            label: 'Edzés Súlyok',
+            label: 'Edzés',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.trending_up_rounded),
@@ -78,6 +80,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.people_rounded),
             label: 'Közösség',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_rounded),
+            label: 'Profil',
           ),
         ],
       ),
