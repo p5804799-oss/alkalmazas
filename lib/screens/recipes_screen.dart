@@ -12,7 +12,7 @@ class RecipesScreen extends StatefulWidget {
 class _RecipesScreenState extends State<RecipesScreen> {
   final ThemeService _theme = ThemeService();
   String _selectedCategory = 'Összes';
-  final List<String> _categories = ['Összes', 'Reggeli', 'Ebéd / Vacsora', 'Snack / Esti étkezés'];
+  final List<String> _categories = ['Összes', 'Reggeli', 'Ebéd / Vacsora', 'Snack'];
 
   @override
   Widget build(BuildContext context) {
