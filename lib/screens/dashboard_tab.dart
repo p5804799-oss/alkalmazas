@@ -1,9 +1,9 @@
-﻿import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+﻿import 'package:flutter/material.dart';
+import 'recipes_screen.dart';
 import '../services/theme_service.dart';
 import '../models/recipe_model.dart';
-import 'recipes_screen.dart';
+import 'dart:convert';
+import 'shared_preferences_helper.dart'; // stub or standard
 
 class DashboardTab extends StatefulWidget {
   const DashboardTab({super.key});
@@ -36,8 +36,8 @@ class _DashboardTabState extends State<DashboardTab> {
   }
 
   Future<void> _loadDashboardData() async {
-    final prefs = await SharedPreferences.getInstance();
-
+    // SharedPreferences betöltés
+    final prefs = await import_shared_preferences();
     final savedOrder = prefs.getStringList('dashboard_card_order');
     if (savedOrder != null && savedOrder.isNotEmpty) {
       _cardOrder = savedOrder;
@@ -54,6 +54,10 @@ class _DashboardTabState extends State<DashboardTab> {
     _currentWeight = prefs.getDouble('user_current_weight') ?? 78.5;
 
     setState(() {});
+  }
+
+  Future<dynamic> import_shared_preferences() async {
+    return await SharedPreferences.getInstance();
   }
 
   Future<void> _saveCardOrder() async {
@@ -91,10 +95,10 @@ class _DashboardTabState extends State<DashboardTab> {
             elevation: 0,
             title: RichText(
               text: TextSpan(
-                text: 'Füty',
+                text: 'Dagi',
                 style: TextStyle(color: _theme.primaryColor, fontSize: 22, fontWeight: FontWeight.w900),
                 children: [
-                  TextSpan(text: 'fürütty', style: TextStyle(color: _theme.secondaryColor)),
+                  TextSpan(text: ' app', style: TextStyle(color: _theme.secondaryColor)),
                 ],
               ),
             ),
