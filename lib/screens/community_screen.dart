@@ -13,7 +13,6 @@ class CommunityScreen extends StatefulWidget {
 class _CommunityScreenState extends State<CommunityScreen> {
   final List<Friend> _friends = CommunityDatabase.mockFriends;
   
-  // Megosztási beállítások állapotai
   bool _shareWeight = true;
   bool _shareCalories = true;
   bool _shareWorkouts = true;
@@ -32,22 +31,16 @@ class _CommunityScreenState extends State<CommunityScreen> {
           children: [
             Text('Közös edzés: ${friend.name}', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
-            ListTile(
-              tileColor: theme.backgroundColor,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              leading: Icon(Icons.fitness_center, color: theme.primaryColor),
-              title: const Text('Edzéstípus kiválasztása', style: TextStyle(color: Colors.white)),
-              trailing: const Icon(Icons.arrow_drop_down, color: Colors.white54),
-              onTap: () {}, // Később legördülő menü
-            ),
-            const SizedBox(height: 12),
-            ListTile(
-              tileColor: theme.backgroundColor,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              leading: const Icon(Icons.schedule, color: Colors.orangeAccent),
-              title: const Text('Időpont beállítása', style: TextStyle(color: Colors.white)),
-              trailing: const Icon(Icons.arrow_drop_down, color: Colors.white54),
-              onTap: () {}, // Később DatePicker
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(color: theme.backgroundColor, borderRadius: BorderRadius.circular(12)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: const [
+                  Text('Kiválasztott edzés: Push Nap', style: TextStyle(color: Colors.white)),
+                  Icon(Icons.fitness_center, color: Colors.orangeAccent),
+                ],
+              ),
             ),
             const SizedBox(height: 24),
             SizedBox(
@@ -57,9 +50,14 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 style: ElevatedButton.styleFrom(backgroundColor: theme.primaryColor, foregroundColor: Colors.black),
                 onPressed: () {
                   Navigator.pop(ctx);
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('✅ Meghívó elküldve ${friend.name} számára!')));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('✅ Sikeres edzésmeghívó elküldve ${friend.name} részére!'),
+                      backgroundColor: const Color(0xFF00E676),
+                    ),
+                  );
                 },
-                child: const Text('Meghívó Küldése', style: TextStyle(fontWeight: FontWeight.bold)),
+                child: const Text('Meghívó Elküldése', style: TextStyle(fontWeight: FontWeight.bold)),
               ),
             ),
           ],
@@ -109,7 +107,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
         backgroundColor: theme.primaryColor,
         icon: const Icon(Icons.person_add, color: Colors.black),
         label: const Text('Barát felvétele', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        onPressed: () {},
+        onPressed: () {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('🔍 Barát keresése és hozzáadása hamarosan...')));
+        },
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
@@ -130,9 +130,10 @@ class _CommunityScreenState extends State<CommunityScreen> {
               ),
               title: Text(friend.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               subtitle: Text(friend.status, style: const TextStyle(color: Colors.white54, fontSize: 12)),
-              trailing: IconButton(
-                icon: Icon(Icons.send_rounded, color: theme.secondaryColor),
+              trailing: ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: theme.secondaryColor.withValues(alpha: 0.2), foregroundColor: theme.secondaryColor, elevation: 0),
                 onPressed: () => _showInviteModal(friend),
+                child: const Text('Meghívás'),
               ),
             ),
           );
@@ -166,12 +167,10 @@ class _CommunityScreenState extends State<CommunityScreen> {
                     ),
                     borderData: FlBorderData(show: false),
                     lineBarsData: [
-                      // Saját adat (Elsődleges szín)
                       LineChartBarData(
                         spots: const [FlSpot(0, 2400), FlSpot(1, 2300), FlSpot(2, 2500), FlSpot(3, 2200), FlSpot(4, 2600)],
                         isCurved: true, color: theme.primaryColor, barWidth: 3, dotData: const FlDotData(show: false),
                       ),
-                      // Barát adata (Másodlagos szín)
                       LineChartBarData(
                         spots: const [FlSpot(0, 2800), FlSpot(1, 2750), FlSpot(2, 2900), FlSpot(3, 2600), FlSpot(4, 3000)],
                         isCurved: true, color: theme.secondaryColor, barWidth: 3, dotData: const FlDotData(show: false),
@@ -223,8 +222,8 @@ class _CommunityScreenState extends State<CommunityScreen> {
         ),
         const SizedBox(height: 8),
         SwitchListTile(
-          title: const Text('Edzésterv megosztása', style: TextStyle(color: Colors.white)),
-          subtitle: const Text('Láthatják, milyen gyakorlatokat és súlyokat használsz.', style: TextStyle(color: Colors.white54, fontSize: 12)),
+          title: const Text('Edzéskiválasztás megosztása', style: TextStyle(color: Colors.white)),
+          subtitle: const Text('Láthatják, milyen edzést csinálsz ma.', style: TextStyle(color: Colors.white54, fontSize: 12)),
           value: _shareWorkouts,
           activeColor: theme.primaryColor,
           onChanged: (val) => setState(() => _shareWorkouts = val),

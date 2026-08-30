@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'screens/main_layout.dart';
 import 'services/theme_service.dart';
 import 'providers/app_state.dart';
+import 'models/user_profile.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,6 +12,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AppState()),
+        ChangeNotifierProvider(create: (_) => UserProfile()),
       ],
       child: const DagiApp(),
     ),
